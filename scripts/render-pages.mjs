@@ -316,7 +316,6 @@ function heroBlock({ image, alt, position = "center", kicker, title, lead, actio
         <div class="hero-visual">
           ${img(image, alt, { eager: true, sizes: page ? "(min-width: 900px) 55vw, 100vw" : "(max-width: 899px) 850px, 100vw", position, className: "hero-media" })}
         </div>
-        ${!page ? `<a href="#prestige-difference" class="hero-scroll"><span>Discover the Prestige difference</span><span aria-hidden="true">↓</span></a>` : ""}
       </div>
     </section>`;
 }
@@ -656,10 +655,9 @@ ${heroBlock({
   image: "hero-training",
   alt: "Nonceba Wimbley demonstrating wine glassware to hospitality professionals during academy training.",
   position: "72% center",
-  kicker: "Professional Hospitality Service Training",
-  title: "Create Experiences Worth Remembering.",
+  title: "Create Experiences<br>Worth Remembering.",
   lead: "The Prestige Signature Standard Academy equips hospitality professionals with the skills, confidence, professional presence and service standards needed to create exceptional guest experiences.",
-  actions: `${modalButton("Schedule a Discovery Consultation", "discovery", "btn-light")}${button("Explore Training Programs", "training-programs.html", "btn-ghost")}`,
+  actions: `${modalButton("Schedule a Discovery Consultation", "discovery", "btn-light")}${button("Explore Training Programs", "training-programs.html", "btn-text")}`,
 })}
 
     <section class="section difference-section bg-ivory" id="prestige-difference">
@@ -668,12 +666,13 @@ ${heroBlock({
           <p class="eyebrow">The Prestige Difference</p>
           <h2 class="section-title title-wide">We don’t just train people to serve. We train professionals to create experiences worth remembering.</h2>
           <div class="media-frame mt-8">
-            ${img("plate-service", "A server carrying a plated dish and service cloth through a dining room.", { position: "center 20%", sizes: "(min-width: 900px) 46vw, 100vw" })}
+            ${img("table-setting", "A formal place setting with gold flatware, white plates, a folded napkin, and glassware.", { position: "center 62%", sizes: "(min-width: 900px) 46vw, 100vw" })}
           </div>
         </div>
         <ul class="capability-list reveal">
           <li>Practical, hands-on service training</li>
           <li>Professional presence and etiquette</li>
+          <li>Place settings and table readiness</li>
           <li>Guest communication and judgment</li>
           <li>Technical service execution</li>
           <li>Assessment and credential pathway</li>
