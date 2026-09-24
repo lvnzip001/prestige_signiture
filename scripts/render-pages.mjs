@@ -304,7 +304,7 @@ ${body}
 `;
 }
 
-function heroBlock({ image, alt, position = "center", kicker, title, lead, actions, page = false, titleClass = "" }) {
+function heroBlock({ image, alt, position = "center", kicker, title, lead, actions, page = false, titleClass = "", band = "" }) {
   return `    <section class="${page ? "page-hero" : "hero"}">
       <div class="hero-stage">
         <div class="hero-copy">
@@ -316,7 +316,7 @@ function heroBlock({ image, alt, position = "center", kicker, title, lead, actio
         <div class="hero-visual">
           ${img(image, alt, { eager: true, sizes: page ? "(min-width: 900px) 55vw, 100vw" : "(max-width: 899px) 850px, 100vw", position, className: "hero-media" })}
         </div>
-      </div>
+      </div>${band}
     </section>`;
 }
 
@@ -658,6 +658,17 @@ ${heroBlock({
   title: "Create Experiences<br>Worth Remembering.",
   lead: "The Prestige Signature Standard Academy equips hospitality professionals with the skills, confidence, professional presence and service standards needed to create exceptional guest experiences.",
   actions: `${modalButton("Schedule a Discovery Consultation", "discovery", "btn-light")}${button("Explore Training Programs", "training-programs.html", "btn-text")}`,
+  band: `
+    <div class="hero-band">
+      <ul class="capability-list">
+        <li>Practical, hands-on service training</li>
+        <li>Professional presence and etiquette</li>
+        <li>Place settings and table readiness</li>
+        <li>Guest communication and judgment</li>
+        <li>Technical service execution</li>
+        <li>Assessment and credential pathway</li>
+      </ul>
+    </div>`,
 })}
 
     <section class="section difference-section bg-ivory" id="prestige-difference">
@@ -665,18 +676,10 @@ ${heroBlock({
         <div class="reveal">
           <p class="eyebrow">The Prestige Difference</p>
           <h2 class="section-title title-wide">We don’t just train people to serve. We train professionals to create experiences worth remembering.</h2>
-          <div class="media-frame mt-8">
-            ${img("table-setting", "A formal place setting with gold flatware, white plates, a folded napkin, and glassware.", { position: "center 62%", sizes: "(min-width: 900px) 46vw, 100vw" })}
-          </div>
         </div>
-        <ul class="capability-list reveal">
-          <li>Practical, hands-on service training</li>
-          <li>Professional presence and etiquette</li>
-          <li>Place settings and table readiness</li>
-          <li>Guest communication and judgment</li>
-          <li>Technical service execution</li>
-          <li>Assessment and credential pathway</li>
-        </ul>
+        <div class="media-frame reveal">
+          ${img("table-setting", "A formal place setting with gold flatware, white plates, a folded napkin, and glassware.", { position: "center 62%", sizes: "(min-width: 900px) 46vw, 100vw" })}
+        </div>
       </div>
     </section>
 
