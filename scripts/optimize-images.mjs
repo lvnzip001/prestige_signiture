@@ -43,7 +43,7 @@ for (const [file, name] of photos) {
   const image = sharp(source, { failOn: "none" }).rotate();
   const meta = await image.metadata();
   const made = [];
-  for (const width of widths) {
+  for (const width of [...new Set([...widths, meta.width])].filter(Boolean).sort((a, b) => a - b)) {
     if (meta.width && width > meta.width) continue;
     const outfile = `${name}-${width}.webp`;
     await sharp(source, { failOn: "none" })
@@ -68,7 +68,9 @@ await copyFile(path.join(sourceDir, "logo.png"), path.join(originalsDir, "logo.p
 await copyFile(path.join(sourceDir, "logo_main.png"), path.join(originalsDir, "logo_main.png"));
 const logoMain = sharp(path.join(sourceDir, "logo_main.png")).trim({ threshold: 12 });
 await logoMain.clone().png().toFile(path.join(optimizedDir, "logo-main.png"));
-await logoMain.clone().resize({ width: 960, withoutEnlargement: true }).webp({ quality: 84 }).toFile(path.join(optimizedDir, "logo.webp"));
+await logoMain.clone().resize({ width: 480, withoutEnlargement: true }).webp({ quality: 82 }).toFile(path.join(optimizedDir, "logo.webp"));
+const logoMeta = await sharp(path.join(optimizedDir, "logo.webp")).metadata();
+manifest.logo = { width: logoMeta.width, height: logoMeta.height };
 await sharp(path.join(optimizedDir, "logo-main.png"))
   .extract({ left: 560, top: 0, width: 500, height: 500 })
   .resize(180, 180)

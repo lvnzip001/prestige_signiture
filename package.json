@@ -7,17 +7,23 @@
     "images": "node scripts/optimize-images.mjs",
     "build:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/site.css --minify",
     "watch:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/site.css --watch",
-    "build": "npm run build:css",
-    "dev": "npx --yes serve . -p 4173"
+    "build:pages": "node scripts/render-pages.mjs",
+    "build": "npm run images && npm run build:pages && npm run build:css",
+    "dev": "npx --yes serve . -l tcp://127.0.0.1:4173 --no-clipboard",
+    "test": "playwright test",
+    "test:quick": "playwright test --grep-invert \"at [0-9]+px\""
   },
   "allowScripts": {
     "@parcel/watcher@2.5.1": true,
     "sharp@0.34.5": true
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@fontsource/cormorant-garamond": "^5.2.8",
     "@fontsource/manrope": "^5.2.8",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/cli": "^4.1.13",
+    "lighthouse": "^12.8.2",
     "sharp": "^0.34.4",
     "tailwindcss": "^4.1.13"
   }

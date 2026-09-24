@@ -19,7 +19,7 @@ The public anon key may be used in the frontend only with correct row-level secu
 
 ## Forms already in the markup
 
-Discovery form: sitewide dialog `#discovery-form` (`data-modal="discovery"`). `source_page` is set to the page that opened it.
+Discovery form: inline at `contact.html#discovery-form`, with a sitewide dialog `#discovery-dialog` (`data-modal="discovery"`). Both use the same field generator. Field IDs are prefixed with `page-discovery-` or `dialog-discovery-`; field names remain unchanged. `source_page` is set to the page that opened it.
 
 Field names:
 
@@ -41,7 +41,7 @@ Field names:
 - `utm_campaign`
 - `company_website` (honeypot, must stay empty)
 
-Interest form: sitewide dialog `#interest-form` (`data-modal="enrollment"`). `source_page` is set to the page that opened it.
+Interest form: inline at `open-enrollment.html#interest-form`, with a sitewide dialog `#enrollment-dialog` (`data-modal="enrollment"`). Field IDs are prefixed with `page-enrollment-` or `dialog-enrollment-`. `source_page` is set to the page that opened it.
 
 Field names:
 
@@ -60,6 +60,12 @@ Field names:
 - `company_website` (honeypot)
 
 Phase 1 submit handlers call `preventDefault()`, validate in the browser, and show a notice that the inquiry was **not** sent. Replace that behavior only when the Edge Function returns a real result. Do not show a success state for a request that did not leave the browser.
+
+Submission buttons are initially disabled and enabled only after the no-network validation handler is attached. Preserve that initialization order when connecting the service. Both inline and dialog forms use `[data-phase1-form]` and `data-form-kind="discovery"` or `"enrollment"`. Replace the shared submit handler once, rather than adding separate network logic for each presentation.
+
+Public `training_interest`, `program_interest`, and `industry` query parameters may prefill matching select options. Unknown values are ignored. Contextual inquiry links carry only these public choices; personal data is never stored in URLs or browser storage. Input field names, consent, honeypot, source page, and UTM names remain the integration contract.
+
+When Phase 2 is enabled, replace the always-visible disconnected notice, retain user input after failures, announce server validation errors accessibly, and display confirmation only after an actual successful response. Keep email and telephone alternatives available.
 
 ## Table: `contact_inquiries`
 

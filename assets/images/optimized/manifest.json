@@ -5,7 +5,8 @@
     "widths": [
       640,
       960,
-      1400
+      1400,
+      1536
     ],
     "file": "ceo_training_waiters_2.jpg"
   },
@@ -14,7 +15,8 @@
     "height": 1448,
     "widths": [
       640,
-      960
+      960,
+      1086
     ],
     "file": "CEO2.jpg"
   },
@@ -23,7 +25,8 @@
     "height": 1536,
     "widths": [
       640,
-      960
+      960,
+      1024
     ],
     "file": "CEO.jpg"
   },
@@ -32,7 +35,8 @@
     "height": 1199,
     "widths": [
       640,
-      960
+      960,
+      1312
     ],
     "file": "Ceo_waiter_traing.jpg"
   },
@@ -42,7 +46,8 @@
     "widths": [
       640,
       960,
-      1400
+      1400,
+      1536
     ],
     "file": "Ceo_in_meeting.jpg"
   },
@@ -51,7 +56,8 @@
     "height": 1148,
     "widths": [
       640,
-      960
+      960,
+      1371
     ],
     "file": "PHOTO-2026-09-18-13-54-59.jpg"
   },
@@ -60,7 +66,8 @@
     "height": 1199,
     "widths": [
       640,
-      960
+      960,
+      1312
     ],
     "file": "table_setting.jpg"
   },
@@ -69,7 +76,8 @@
     "height": 1148,
     "widths": [
       640,
-      960
+      960,
+      1371
     ],
     "file": "waiter_setting_table.jpg"
   },
@@ -78,7 +86,8 @@
     "height": 1199,
     "widths": [
       640,
-      960
+      960,
+      1312
     ],
     "file": "waiter_serving.jpg"
   },
@@ -87,7 +96,8 @@
     "height": 1536,
     "widths": [
       640,
-      960
+      960,
+      1024
     ],
     "file": "male_waiter_serving.jpg"
   },
@@ -96,7 +106,8 @@
     "height": 1536,
     "widths": [
       640,
-      960
+      960,
+      1024
     ],
     "file": "waiter_outside.jpg"
   },
@@ -105,7 +116,8 @@
     "height": 1148,
     "widths": [
       640,
-      960
+      960,
+      1370
     ],
     "file": "bartender.jpg"
   },
@@ -114,7 +126,8 @@
     "height": 1448,
     "widths": [
       640,
-      960
+      960,
+      1086
     ],
     "file": "waiter_wine_bottle.jpg"
   },
@@ -123,7 +136,8 @@
     "height": 1148,
     "widths": [
       640,
-      960
+      960,
+      1370
     ],
     "file": "waiter_award.jpg"
   },
@@ -132,7 +146,8 @@
     "height": 1148,
     "widths": [
       640,
-      960
+      960,
+      1370
     ],
     "file": "waiter_training.jpg"
   },
@@ -141,7 +156,8 @@
     "height": 1536,
     "widths": [
       640,
-      960
+      960,
+      1024
     ],
     "file": "waiters.jpg"
   },
@@ -150,7 +166,8 @@
     "height": 1536,
     "widths": [
       640,
-      960
+      960,
+      1024
     ],
     "file": "woman waiter.jpg"
   },
@@ -160,8 +177,13 @@
     "widths": [
       640,
       960,
-      1400
+      1400,
+      1536
     ],
     "file": "meeting_setting.jpg"
+  },
+  "logo": {
+    "width": 480,
+    "height": 374
   }
 }

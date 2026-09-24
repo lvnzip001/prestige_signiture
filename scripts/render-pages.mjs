@@ -1,28 +1,11 @@
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const arrow = `<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 8h11M9 3.5 13.5 8 9 12.5"/></svg>`;
 
-const photos = {
-  "hero-training": { w: 1536, h: 1024, widths: [640, 960, 1400] },
-  "founder-portrait": { w: 1086, h: 1448, widths: [640, 960] },
-  "founder-standing": { w: 1024, h: 1536, widths: [640, 960] },
-  coaching: { w: 1312, h: 1199, widths: [640, 960] },
-  "founder-meeting": { w: 1536, h: 1024, widths: [640, 960, 1400] },
-  "fine-dining": { w: 1371, h: 1148, widths: [640, 960] },
-  "table-setting": { w: 1312, h: 1199, widths: [640, 960] },
-  "place-setting": { w: 1371, h: 1148, widths: [640, 960] },
-  "table-service": { w: 1312, h: 1199, widths: [640, 960] },
-  "plate-service": { w: 1024, h: 1536, widths: [640, 960] },
-  "club-service": { w: 1024, h: 1536, widths: [640, 960] },
-  "beverage-service": { w: 1370, h: 1148, widths: [640, 960] },
-  "bottle-service": { w: 1086, h: 1448, widths: [640, 960] },
-  "credential-moment": { w: 1370, h: 1148, widths: [640, 960] },
-  "academy-training": { w: 1370, h: 1148, widths: [640, 960] },
-  "service-team": { w: 1024, h: 1536, widths: [640, 960] },
-  "hospitality-professional": { w: 1024, h: 1536, widths: [640, 960] },
-  "training-room": { w: 1536, h: 1024, widths: [640, 960, 1400] },
-};
+const photos = JSON.parse(await readFile(new URL("../assets/images/optimized/manifest.json", import.meta.url), "utf8"));
+const industryValues = ["Restaurant", "Hotel-Resort", "Golf-Country Club", "Private Club", "Event-Banquet", "Catering"];
+const programValues = ["Half-Day", "Full-Day", "Two-Day", "Full Academy"];
 
 const nav = [
   ["training-programs.html", "Training Programs"],
@@ -33,6 +16,100 @@ const nav = [
   ["contact.html", "Contact"],
 ];
 
+const menus = [
+  {
+    id: "programs",
+    href: "training-programs.html",
+    label: "Training Programs",
+    overview: "All programs",
+    lead: "Private cohorts of up to 25.",
+    feature: ["training-programs.html", "hero-training", "A training session with hospitality professionals around a whiteboard.", "All programs", "Starting prices, per cohort."],
+    items: [
+      ["training-programs.html#half-day", "Half-Day", "Starting at $3,750."],
+      ["training-programs.html#full-day", "Full-Day", "Starting at $6,000."],
+      ["training-programs.html#two-day", "Two-Day Signature", "Starting at $10,000."],
+      ["training-programs.html#full-academy", "Five-Day Full Academy", "Starting at $35,000. Credential pathway."],
+      ["training-programs.html#curriculum", "Curriculum", "Fifteen modules, from presence to the capstone."],
+    ],
+  },
+  {
+    id: "standard",
+    href: "prestige-standard.html",
+    label: "The Prestige Standard",
+    overview: "The standard",
+    lead: "Presence, Observe, Initiate, Serve, Elevate.",
+    feature: ["prestige-standard.html#poise", "coaching", "Practical coaching in plate presentation.", "P.O.I.S.E. Method™", "The sequence behind the guest experience."],
+    items: [
+      ["prestige-standard.html#standard-poise-0", "Presence", "Confidence and readiness before the first word."],
+      ["prestige-standard.html#standard-poise-1", "Observe", "Read the guest, the table and the room."],
+      ["prestige-standard.html#standard-poise-2", "Initiate", "Act before every need has to be stated."],
+      ["prestige-standard.html#standard-poise-3", "Serve", "Technical and interpersonal precision."],
+      ["prestige-standard.html#standard-poise-4", "Elevate", "Make correct service feel personal."],
+      ["prestige-standard.html#method", "How we teach", "Demonstration, explanation, practice, assessment."],
+      ["prestige-standard.html#client-standards", "Client SOP integration", "Your procedures, taught with the standard."],
+    ],
+  },
+  {
+    id: "credential",
+    href: "professional-credential.html",
+    label: "Professional Credential",
+    overview: "The credential",
+    lead: "Earned through the Five-Day Full Academy.",
+    feature: ["professional-credential.html", "credential-moment", "A certificate presentation during a Prestige academy recognition moment.", "The credential", "Valid for two years."],
+    items: [
+      ["professional-credential.html#requirements", "Requirements", "90% attendance, 80% knowledge, 80% practical, Module 15."],
+      ["professional-credential.html#certificate", "Certificate and credential", "A certificate confirms completion. The credential is earned."],
+      ["professional-credential.html#renewal", "Validity and renewal", "Two years. Renewal from $650."],
+      ["training-programs.html#full-academy", "Full Academy", "The pathway to the Professional Service Credential."],
+    ],
+  },
+  {
+    id: "serve",
+    href: "who-we-serve.html",
+    label: "Who We Serve",
+    overview: "All sectors",
+    lead: "Restaurants, hotels, clubs and event teams.",
+    feature: ["who-we-serve.html", "fine-dining", "A server presenting plates to guests in a fine-dining room.", "All sectors", "Your standards stay in place."],
+    items: [
+      ["who-we-serve.html#restaurants", "Restaurants &amp; Fine Dining", "Presence, technique and table awareness."],
+      ["who-we-serve.html#hotels", "Hotels &amp; Resorts", "Guest-facing service across the brand experience."],
+      ["who-we-serve.html#golf", "Golf &amp; Country Clubs", "Members, guests, dining rooms and events."],
+      ["who-we-serve.html#private-clubs", "Private Clubs", "Discretion, anticipation and consistency."],
+      ["who-we-serve.html#events", "Event &amp; Banquet Venues", "Coordinated service in a fast room."],
+      ["who-we-serve.html#catering", "Catering Teams", "The same standard across changing venues."],
+    ],
+  },
+  {
+    id: "about",
+    href: "about.html",
+    label: "About",
+    overview: "Nonceba Wimbley",
+    lead: "Nonceba Wimbley, Founder &amp; Chief Executive Officer.",
+    feature: ["about.html#founder-story", "founder-portrait", "Portrait of Nonceba Wimbley, Founder and Chief Executive Officer.", "Founder story", "Cape Town, 2008, to the academy."],
+    items: [
+      ["about.html#founder-story", "Founder story", "From Ocean Basket in Cape Town to the academy."],
+      ["about.html#philosophy", "Philosophy", "Welcomed, valued, respected and cared for."],
+      ["about.html#mission", "Mission", "Skills, confidence, presence and a stronger service culture."],
+      ["about.html#vision", "Vision", "A recognized standard of professional hospitality service."],
+    ],
+  },
+  {
+    id: "contact",
+    href: "contact.html",
+    label: "Contact",
+    overview: "Academy contact",
+    mark: ["open-enrollment.html"],
+    lead: `Bryant, Arkansas · <a href="tel:+15015595118">501-559-5118</a>`,
+    feature: ["open-enrollment.html", "academy-training", "Hospitality professionals practicing glassware, plate and service-tool standards.", "Open Enrollment", "Dates are announced only after a session is scheduled."],
+    items: [
+      ["contact.html#discovery-form", "Discovery consultation", "Tell us where your team is today.", "discovery"],
+      ["open-enrollment.html", "Open Enrollment", "Per person, once a class is confirmed. From $300."],
+      ["open-enrollment.html#pricing", "Per-person pricing", "Half-Day $300 through Full Academy $3,200."],
+      ["open-enrollment.html#interest-form", "Interest list", "Be contacted when a session is scheduled.", "enrollment"],
+    ],
+  },
+];
+
 function img(name, alt, options = {}) {
   const photo = photos[name];
   const sizes = options.sizes || "(min-width: 900px) 50vw, 100vw";
@@ -41,7 +118,7 @@ function img(name, alt, options = {}) {
   const loading = options.eager ? `loading="eager" fetchpriority="high"` : `loading="lazy" decoding="async"`;
   const pos = options.position ? ` style="object-position:${options.position}"` : "";
   const cls = options.className ? ` class="${options.className}"` : "";
-  return `<img src="assets/images/optimized/${name}-${largest}.webp" srcset="${srcset}" sizes="${sizes}" width="${photo.w}" height="${photo.h}" alt="${alt}"${cls} ${loading}${pos}>`;
+  return `<img src="assets/images/optimized/${name}-${largest}.webp" srcset="${srcset}" sizes="${sizes}" width="${photo.width}" height="${photo.height}" alt="${alt}"${cls} ${loading}${pos}>`;
 }
 
 function button(label, href, variant = "btn-ink") {
@@ -50,71 +127,114 @@ function button(label, href, variant = "btn-ink") {
 
 function modalButton(label, modal, variant = "btn-ink", options = {}) {
   const mark = options.arrow === false ? "" : arrow;
-  const preset = options.preset
-    ? ` data-preset-field="${options.preset.field}" data-preset-value="${options.preset.value}"`
-    : "";
-  return `<button class="btn ${variant}" type="button" data-open-modal="${modal}"${preset}>${label}${mark}</button>`;
+  const preset = options.preset;
+  const query = preset ? `?${new URLSearchParams({ [preset.field]: preset.value })}` : "";
+  const href = modal === "discovery" ? `contact.html${query}#discovery-form` : `open-enrollment.html${query}#interest-form`;
+  return `<a class="btn ${variant}" href="${href}" data-open-modal="${modal}">${label}${mark}</a>`;
 }
 
-function header() {
-  const links = nav
-    .map(([href, label]) => `<a data-nav href="${href}">${label}</a>`)
-    .join("\n        ");
-  const mobileLinks = nav
-    .map(([href, label]) => `<a data-nav href="${href}">${label}</a>`)
-    .join("\n          ");
+function menuItem(item) {
+  const [href, title, note, modal] = item;
+  const opener = modal ? ` data-open-modal="${modal}"` : "";
+  return `<a href="${href}"${opener}><strong>${title}</strong><span>${note}</span></a>`;
+}
+
+function menuFeature([href, image, alt, label, note]) {
+  return `<a class="nav-feature" href="${href}">
+    <span class="nav-feature-media">${img(image, alt, { className: "nav-feature-img", sizes: "(min-width: 1320px) 24vw, 80vw" })}</span>
+    <span class="nav-feature-copy"><strong>${label}</strong><span>${note}</span></span>
+  </a>`;
+}
+
+function header(activeFile) {
+  const isCurrent = (menu) => menu.href === activeFile || (menu.mark || []).includes(activeFile);
+  const desktop = menus.map((menu) => `<div class="nav-item" data-nav-item>
+          <a class="nav-link" data-nav ${isCurrent(menu) ? 'aria-current="page"' : ""} href="${menu.href}">${menu.label}</a>
+          <div class="nav-panel" id="nav-${menu.id}" role="region" aria-label="${menu.label}">
+            <div class="nav-panel-inner">
+              <div class="nav-panel-main">
+                <p class="nav-panel-lead">${menu.lead}</p>
+                <div class="nav-links">${menu.items.map(menuItem).join("")}</div>
+              </div>
+              ${menuFeature(menu.feature)}
+            </div>
+          </div>
+        </div>`).join("\n        ");
+  const mobile = menus.map((menu) => `<details class="mobile-group"${isCurrent(menu) ? " open" : ""}>
+            <summary>${menu.label}</summary>
+            <div class="mobile-sub">
+              <a data-nav ${menu.href === activeFile ? 'aria-current="page"' : ""} href="${menu.href}">${menu.overview}</a>
+              ${menu.items.map(menuItem).join("\n              ")}
+            </div>
+          </details>`).join("\n          ");
   return `<header class="site-header" data-header>
     <div class="header-inner">
       <a class="brand" href="index.html">
-        <img src="assets/images/optimized/logo-main.png" width="1127" height="877" alt="The Prestige Signature Standard Academy">
+        <img src="assets/images/optimized/logo.webp" width="${photos.logo.width}" height="${photos.logo.height}" alt="The Prestige Signature Standard Academy">
       </a>
       <nav class="desktop-nav" aria-label="Primary">
-        ${links}
-        <a data-nav class="nav-enroll" href="open-enrollment.html">Open Enrollment</a>
+        ${desktop}
       </nav>
-      <button class="btn btn-light header-cta" type="button" data-open-modal="discovery">Schedule a Discovery Consultation</button>
-      <a class="header-enroll" data-nav href="open-enrollment.html">Open Enrollment</a>
-      <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="mobile-nav">
-        <span class="sr-only">Menu</span>
-        <span class="nav-toggle-bars" aria-hidden="true"></span>
-      </button>
+      <div class="header-tools">
+        ${modalButton("Schedule a Discovery Consultation", "discovery", "btn-light header-cta", { arrow: false })}
+        <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="mobile-nav">
+          <span class="sr-only">Menu</span>
+          <span class="nav-toggle-bars" aria-hidden="true"></span>
+        </button>
+      </div>
     </div>
-    <div id="mobile-nav" class="mobile-nav" data-nav-panel hidden>
+    <div id="mobile-nav" class="mobile-nav" data-nav-panel>
       <nav aria-label="Mobile">
-        <button class="btn btn-light" type="button" data-open-modal="discovery">Schedule a Discovery Consultation</button>
-        <a data-nav class="mobile-enroll" href="open-enrollment.html">Open Enrollment</a>
-          ${mobileLinks}
+        ${modalButton("Schedule a Discovery Consultation", "discovery", "btn-light")}
+        ${mobile}
       </nav>
     </div>
   </header>`;
 }
 
-function footer() {
-  const links = nav
-    .map(([href, label]) => `<a href="${href}">${label}</a>`)
-    .join("\n        ");
+function footer(activeFile) {
+  const here = (href) => href === activeFile ? ' aria-current="page"' : "";
   return `<footer class="site-footer">
     <div class="wrap footer-grid">
       <div class="footer-brand stack">
-        <img src="assets/images/optimized/logo-main.png" width="1127" height="877" alt="The Prestige Signature Standard Academy">
+        <img src="assets/images/optimized/logo.webp" width="${photos.logo.width}" height="${photos.logo.height}" alt="The Prestige Signature Standard Academy">
         <p>Professional Hospitality Service Training</p>
         <p>The Prestige Signature Standard™<br>P.O.I.S.E. Method™</p>
+        <p>Bryant, Arkansas</p>
       </div>
-      <nav class="footer-nav" aria-label="Footer">
-        <a href="index.html">Home</a>
-        ${links}
-        <a href="open-enrollment.html">Open Enrollment</a>
+      <nav class="footer-nav" aria-label="Academy">
+        <p class="footer-label">Academy</p>
+        <a${here("index.html")} href="index.html">Home</a>
+        <a${here("prestige-standard.html")} href="prestige-standard.html">The Prestige Standard</a>
+        <a${here("who-we-serve.html")} href="who-we-serve.html">Who We Serve</a>
+        <a${here("about.html")} href="about.html">About</a>
+        <a${here("contact.html")} href="contact.html">Contact</a>
+      </nav>
+      <nav class="footer-nav" aria-label="Training">
+        <p class="footer-label">Training</p>
+        <a${here("training-programs.html")} href="training-programs.html">Training Programs</a>
+        <a href="training-programs.html#half-day">Half-Day</a>
+        <a href="training-programs.html#full-day">Full-Day</a>
+        <a href="training-programs.html#two-day">Two-Day Signature</a>
+        <a href="training-programs.html#full-academy">Five-Day Full Academy</a>
+        <a${here("professional-credential.html")} href="professional-credential.html">Professional Credential</a>
+        <a${here("open-enrollment.html")} href="open-enrollment.html">Open Enrollment</a>
       </nav>
       <div class="footer-contact">
-        <button class="link-button" type="button" data-open-modal="discovery">Schedule a Discovery Consultation</button>
+        <p class="footer-label">Contact</p>
+        ${modalButton("Schedule a Discovery Consultation", "discovery", "footer-discovery")}
         <a href="tel:+15015595118">501-559-5118</a>
         <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a>
         <p>Bryant, Arkansas</p>
       </div>
     </div>
-    <!-- Legal links stay unpublished until approved Privacy and Terms copy is supplied. -->
     <div class="wrap footer-base">
       <p>&copy; <span data-year>2026</span> The Prestige Signature Standard Academy. All rights reserved.</p>
+      <nav class="footer-legal" aria-label="Policies">
+        <a${here("privacy.html")} href="privacy.html">Privacy</a>
+        <a${here("terms.html")} href="terms.html">Terms</a>
+        <a${here("accessibility.html")} href="accessibility.html">Accessibility</a>
+      </nav>
     </div>
   </footer>`;
 }
@@ -144,7 +264,7 @@ function layout({ file, title, description, path: urlPath, body }) {
   <link rel="icon" href="assets/icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="stylesheet" href="assets/css/site.css">
-  <script>document.documentElement.classList.add("js")</script>
+  <link rel="preload" href="assets/fonts/cormorant-garamond-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -170,13 +290,13 @@ function layout({ file, title, description, path: urlPath, body }) {
   }
   </script>
 </head>
-<body>
+<body class="page-${file.replace(".html", "")}">
   <a class="skip-link" href="#main">Skip to content</a>
-  ${header()}
+  ${header(file)}
   <main id="main">
 ${body}
   </main>
-  ${footer()}
+  ${footer(file)}
   ${modals()}
   <script src="assets/js/main.js" defer></script>
 </body>
@@ -194,14 +314,15 @@ function heroBlock({ image, alt, position = "center", kicker, title, lead, actio
           ${actions ? `<div class="hero-actions">${actions}</div>` : ""}
         </div>
         <div class="hero-visual">
-          ${img(image, alt, { eager: true, sizes: "(min-width: 900px) 58vw, 100vw", position, className: "hero-media" })}
+          ${img(image, alt, { eager: true, sizes: page ? "(min-width: 900px) 55vw, 100vw" : "(max-width: 899px) 850px, 100vw", position, className: "hero-media" })}
         </div>
+        ${!page ? `<a href="#prestige-difference" class="hero-scroll"><span>Discover the Prestige difference</span><span aria-hidden="true">↓</span></a>` : ""}
       </div>
     </section>`;
 }
 
 function closing(title, copy, label, href) {
-  return `    <section class="section bg-ink light-type">
+  return `    <section class="section closing-section bg-ink light-type">
       <div class="wrap reveal">
         <h2 class="section-title">${title}</h2>
         <p class="lead mt-6">${copy}</p>
@@ -218,75 +339,134 @@ const programs = [
 ];
 
 const modules = [
-  ["Professional Presence &amp; Appearance", "Image, grooming, posture and how a professional enters the room."],
-  ["Tools of the Trade", "The tools of service, handled correctly."],
-  ["Table &amp; Place Setting", "Setup, place settings and readiness."],
-  ["Plate Handling", "Safe, controlled plate service."],
-  ["Glassware", "Recognition, handling and presentation."],
-  ["Beverage Service", "Presentation, handling and guest technique."],
-  ["Bottle Service", "Presentation, handling and pouring mechanics."],
-  ["The Guest Approach", "How to approach, greet and begin the relationship."],
-  ["Communication", "Clear, respectful communication with different guests."],
-  ["Reading the Table", "When to act, and when not to interrupt."],
-  ["The Prestige Service Sequence", "How the techniques connect into one service."],
-  ["Table Maintenance", "Cleanliness, order and guest comfort through the meal."],
-  ["Anticipating Guest Needs", "From reacting to noticing what is needed next."],
-  ["Difficult Guests &amp; Service Recovery", "Composure and recovery when service goes wrong."],
-  ["The Final Experience", "Capstone using the Prestige Standard™ and P.O.I.S.E. Method™."],
+  [
+    "Professional Presence & Appearance",
+    "Professional image, grooming, posture, confidence and the way a service professional enters the guest experience."
+  ],
+  [
+    "Tools of the Trade",
+    "Understanding and professionally handling the tools used to deliver consistent service."
+  ],
+  [
+    "Table & Place Setting",
+    "Professional table setup, place settings and readiness standards."
+  ],
+  [
+    "Plate Handling",
+    "Safe, polished and controlled plate handling and service technique."
+  ],
+  [
+    "Glassware",
+    "Glassware recognition, handling, presentation and professional standards."
+  ],
+  [
+    "Beverage Service",
+    "Professional beverage presentation, handling and guest service technique."
+  ],
+  [
+    "Bottle Service",
+    "Physical bottle presentation, handling and pouring mechanics within Prestige’s service-training scope."
+  ],
+  [
+    "The Guest Approach",
+    "How to approach, greet and establish a professional guest relationship."
+  ],
+  [
+    "Communication",
+    "Clear, confident, respectful communication across different guests and situations."
+  ],
+  [
+    "Reading the Table",
+    "Observing cues, timing and guest behavior to determine when to act—and when not to interrupt."
+  ],
+  [
+    "The Prestige Service Sequence",
+    "A disciplined sequence that connects individual techniques into a polished service experience."
+  ],
+  [
+    "Table Maintenance",
+    "Maintaining cleanliness, order, readiness and guest comfort throughout the experience."
+  ],
+  [
+    "Anticipating Guest Needs",
+    "Moving from reactive service to thoughtful, proactive hospitality."
+  ],
+  [
+    "Difficult Guests & Service Recovery",
+    "Professional response, composure and recovery when the guest experience goes wrong."
+  ],
+  [
+    "The Final Experience",
+    "Integrated capstone applying the Prestige Signature Standard™ and P.O.I.S.E. Method™ in a realistic service experience."
+  ]
 ];
 
 const poise = [
-  ["P", "Presence", "Confidence and readiness before the first word."],
-  ["O", "Observe", "Read the guest and the room before you act."],
-  ["I", "Initiate", "Act before every need has to be asked for."],
-  ["S", "Serve", "Technical and personal details, done with care."],
-  ["E", "Elevate", "Make correct service feel personal."],
+  [
+    "P",
+    "Presence",
+    "Present yourself with confidence, professionalism and readiness before the first word is spoken."
+  ],
+  [
+    "O",
+    "Observe",
+    "Read the guest, table and environment. Notice what is happening before deciding what to do."
+  ],
+  [
+    "I",
+    "Initiate",
+    "Act proactively and appropriately rather than waiting for every need to be stated."
+  ],
+  [
+    "S",
+    "Serve",
+    "Execute the technical and interpersonal elements of service with precision and care."
+  ],
+  [
+    "E",
+    "Elevate",
+    "Turn technically correct service into an experience that feels thoughtful, personal and memorable."
+  ]
 ];
 
 const sectors = [
-  ["restaurants", "Restaurants &amp; Fine Dining", "Presence, technique, table awareness and consistency.", "fine-dining", "A server presenting plates to guests in a fine-dining room.", "center"],
-  ["hotels", "Hotels &amp; Resorts", "Polished guest-facing service where the brand experience matters.", "hospitality-professional", "A server carrying beverages along a resort pool terrace.", "center 30%"],
-  ["golf", "Golf &amp; Country Clubs", "Attentive service for members, guests, dining and events.", "club-service", "A server carrying plates to guests on a club terrace beside a golf course.", "center 20%"],
-  ["private-clubs", "Private Clubs", "Discretion, professionalism and anticipation.", "service-team", "A uniformed service team standing together in a hotel lobby.", "center 15%"],
-  ["events", "Event &amp; Banquet Venues", "Coordinated service in a fast room.", "place-setting", "A server finishing glassware and flowers on an outdoor banquet table.", "center"],
-  ["catering", "Catering &amp; Event-Service Teams", "The same standard across changing venues.", "plate-service", "A server carrying a plated dish and service cloth through a dining room.", "center 20%"],
+  ["restaurants", "Restaurants &amp; Fine Dining", "Strengthen professional presence, technical service, table awareness, communication and consistency across the guest journey.", "fine-dining", "A server presenting plates to guests in a fine-dining room.", "center"],
+  ["hotels", "Hotels &amp; Resorts", "Support polished guest-facing service across dining and hospitality environments where the brand experience matters.", "hospitality-professional", "A server carrying beverages along a resort pool terrace.", "center 30%"],
+  ["golf", "Golf &amp; Country Clubs", "Develop consistent, attentive service for members, guests, dining rooms and special events.", "club-service", "A server carrying plates to guests on a club terrace beside a golf course.", "center 20%"],
+  ["private-clubs", "Private Clubs", "Reinforce discretion, professionalism, anticipation and service standards in relationship-driven environments.", "service-team", "A uniformed service team standing together in a hotel lobby.", "center 15%"],
+  ["events", "Event &amp; Banquet Venues", "Build coordinated service behavior, presentation and guest awareness in fast-moving event environments.", "place-setting", "A server finishing glassware and flowers on an outdoor banquet table.", "center"],
+  ["catering", "Catering &amp; Event-Service Teams", "Strengthen portable service standards, team coordination and professional execution across changing venues.", "plate-service", "A server carrying a plated dish and service cloth through a dining room.", "center 20%"],
 ];
 
+function poiseFeature(prefix) {
+  const images = ["founder-portrait", "table-service", "coaching", "bottle-service", "fine-dining"];
+  const alts = ["Nonceba Wimbley, Founder and Chief Executive Officer.", "A professional server attending to guests at their table.", "Practical coaching in plate presentation.", "A service professional presenting a bottle.", "Attentive service in a fine-dining room."];
+  return `<div class="poise-explorer" data-poise>
+    <div class="poise-controls" aria-label="Explore the five POISE stages">
+      ${poise.map(([letter, word], i) => `<a href="#${prefix}-${i}" class="poise-step" data-poise-tab><span class="poise-letter">${letter}</span><span class="poise-word">${word}</span></a>`).join("")}
+    </div>
+    <div class="poise-panels">${poise.map(([letter, word, copy], i) => `<article class="poise-panel" id="${prefix}-${i}" data-poise-panel>
+      <div class="poise-image">${img(images[i], alts[i], { position: i === 0 ? "center 24%" : "center 35%", sizes: "(min-width: 900px) 45vw, 100vw" })}</div>
+      <div class="poise-description"><p class="eyebrow eyebrow-light">The P.O.I.S.E. Method™ · 0${i+1}</p><h3 class="section-title">${word}</h3><p class="lead">${copy}</p><span class="poise-index" aria-hidden="true">${letter}</span></div>
+    </article>`).join("")}</div>
+  </div>`;
+}
+
 function programRows(linked) {
-  return programs
-    .map(([id, name, price, copy]) => {
-      const inner = `<div>
-            <h3 class="subhead">${name}</h3>
-            <p class="mt-3">${copy}</p>
-          </div>
-          <p>Up to 25 participants.</p>
-          <p class="price"><small>Starting at</small>$${price}</p>`;
-      if (!linked) {
-        return `<article class="program-row" id="${id}">${inner}</article>`;
-      }
-      return `<a class="program-row" href="training-programs.html#${id}">${inner}</a>`;
-    })
-    .join("\n        ");
+  const images = ["place-setting", "coaching", "table-service", "hero-training"];
+  const labels = ["Half a day", "One day", "Two days", "Five days"];
+  return `<div class="program-collection${linked ? " program-rail" : ""}"${linked ? " data-rail" : ""}><div class="program-grid"${linked ? ' data-rail-track tabindex="0" role="region" aria-label="Flagship training programs"' : ""}>${programs.map(([id, name, price, copy], index) => `<article class="program-card" id="${id}">
+    <div class="program-image">${img(images[index], `${name}: practical hospitality service training.`, { sizes: "(min-width: 1100px) 23vw, (min-width: 640px) 46vw, 100vw" })}<span class="program-duration">${labels[index]}</span></div>
+    <div class="program-body"><p class="eyebrow">0${index+1} / Private training</p><h3 class="subhead">${name}</h3><p class="program-summary">${copy}</p><p class="price"><small>Starting at</small>$${price}</p><p class="cohort-note">Per cohort · Up to 25 participants</p>
+    ${linked ? button("Explore program", `training-programs.html#${id}`, "btn-ghost-ink") : `<details class="program-details"><summary>Explore this program<span aria-hidden="true">+</span></summary><div><p>${index === 3 ? "Comprehensive service development with the professional credential pathway. The credential is earned through the Full Academy assessment and performance requirements." : "Training can be customized around selected modules and your organization’s approved service procedures. Prestige begins with discovery before recommending a program."}</p>${modalButton("Discuss this program", "discovery", "btn-ink", { preset: { field: "training_interest", value: programValues[index] } })}</div></details>`}
+    </div></article>`).join("")}</div>${linked ? `<div class="rail-controls"><span>Explore the programs</span><div><button type="button" data-rail-prev aria-label="Previous program">←</button><button type="button" data-rail-next aria-label="Next program">→</button></div></div>` : ""}</div>`;
 }
 
 function accordion() {
-  return modules
-    .map(([title, copy], index) => {
-      const n = String(index + 1).padStart(2, "0");
-      return `<div class="accordion">
-          <h3>
-            <button class="accordion-trigger" id="module-btn-${index + 1}" type="button" aria-expanded="false" aria-controls="module-${index + 1}" data-accordion>
-              <span class="accordion-index">${n}</span>
-              <span>${title}</span>
-              <span class="accordion-icon" aria-hidden="true"></span>
-            </button>
-          </h3>
-          <div class="accordion-panel" id="module-${index + 1}" role="region" aria-labelledby="module-btn-${index + 1}" hidden>
-            <p>${copy}</p>
-          </div>
-        </div>`;
-    })
-    .join("\n        ");
+  return modules.map(([title, copy], index) => `<details class="accordion" id="module-${index+1}">
+    <summary class="accordion-trigger"><span class="accordion-index">${String(index+1).padStart(2,"0")}</span><span>${title}</span><span class="accordion-icon" aria-hidden="true"></span></summary>
+    <div class="accordion-panel"><p>${copy}</p></div>
+  </details>`).join("");
 }
 
 function hiddenMeta(source) {
@@ -307,16 +487,8 @@ function formNotice() {
         </div>`;
 }
 
-function modals() {
-  return `<dialog class="modal" id="discovery-form" data-modal="discovery" aria-labelledby="discovery-modal-title">
-  <div class="modal-panel">
-    <div class="modal-toolbar">
-      <button class="modal-close" type="button" data-close-modal>Close</button>
-    </div>
-    <p class="eyebrow">Discovery</p>
-    <h2 id="discovery-modal-title" class="subhead">Schedule a Discovery Consultation</h2>
-    <p class="modal-lead">Nothing is sent until online submission is connected.</p>
-    <form action="#" method="post" novalidate data-phase1-form>
+function formMarkup(name, prefix) {
+  const fields = name === "discovery" ? `    <form action="#" method="post" novalidate data-phase1-form>
       ${hiddenMeta("contact")}
       <div class="form-grid two">
         <div class="field">
@@ -403,18 +575,7 @@ function modals() {
         <button class="btn btn-ink" type="submit">Schedule a Discovery Consultation${arrow}</button>
       </div>
       ${formNotice()}
-    </form>
-  </div>
-</dialog>
-<dialog class="modal" id="interest-form" data-modal="enrollment" aria-labelledby="interest-modal-title">
-  <div class="modal-panel">
-    <div class="modal-toolbar">
-      <button class="modal-close" type="button" data-close-modal>Close</button>
-    </div>
-    <p class="eyebrow">Open Enrollment</p>
-    <h2 id="interest-modal-title" class="subhead">Join the Interest List</h2>
-    <p class="modal-lead">No date is promised. Nothing is sent until online submission is connected.</p>
-    <form action="#" method="post" novalidate data-phase1-form>
+    </form>` : `    <form action="#" method="post" novalidate data-phase1-form>
       ${hiddenMeta("enrollment")}
       <div class="form-grid two">
         <div class="field">
@@ -471,9 +632,18 @@ function modals() {
         <button class="btn btn-ink" type="submit">Join the Interest List${arrow}</button>
       </div>
       ${formNotice()}
-    </form>
-  </div>
-</dialog>`;
+    </form>`;
+  return `<div class="form-intro"><p>Online submission is being connected. This form will not send your details.</p><p>To speak with Prestige, <a href="tel:+15015595118">call 501-559-5118</a> or <a href="mailto:nwimbley@prestigesignaturestandard.com">email the Academy</a>.</p><p class="form-required">Fields marked * are required.</p></div>` + fields
+    .replace('data-phase1-form', `data-phase1-form data-form-kind="${name}"`)
+    .replaceAll('type="submit"', 'type="submit" disabled')
+    .replace(/(id|for|aria-describedby|data-error-for)="([^"]+)"/g, (_, attr, value) => `${attr}="${value.split(" ").map(id => `${prefix}-${id}`).join(" ")}"`);
+}
+
+function modals() {
+  return [["discovery", "Schedule a Discovery Consultation"], ["enrollment", "Join the Interest List"]].map(([name, title]) => `<dialog class="modal" id="${name}-dialog" data-modal="${name}" aria-labelledby="${name}-dialog-title">
+    <div class="modal-panel"><div class="modal-toolbar"><p class="eyebrow">The Prestige Academy</p><button class="modal-close" type="button" data-close-modal aria-label="Close ${name} form">Close <span aria-hidden="true">×</span></button></div>
+    <h2 id="${name}-dialog-title" class="subhead">${title}</h2>${formMarkup(name, `dialog-${name}`)}</div>
+  </dialog>`).join("");
 }
 
 const home = layout({
@@ -488,11 +658,11 @@ ${heroBlock({
   position: "72% center",
   kicker: "Professional Hospitality Service Training",
   title: "Create Experiences Worth Remembering.",
-  lead: "Skill, presence and service standards for exceptional guest experiences.",
+  lead: "The Prestige Signature Standard Academy equips hospitality professionals with the skills, confidence, professional presence and service standards needed to create exceptional guest experiences.",
   actions: `${modalButton("Schedule a Discovery Consultation", "discovery", "btn-light")}${button("Explore Training Programs", "training-programs.html", "btn-ghost")}`,
 })}
 
-    <section class="section bg-ivory">
+    <section class="section difference-section bg-ivory" id="prestige-difference">
       <div class="wrap grid gap-12 min-[900px]:grid-cols-2 min-[900px]:items-center">
         <div class="reveal">
           <p class="eyebrow">The Prestige Difference</p>
@@ -515,9 +685,7 @@ ${heroBlock({
       <div class="wrap reveal">
         <p class="eyebrow eyebrow-light">Powered by the P.O.I.S.E. Method™</p>
         <h2 class="section-title">The Prestige Signature Standard™</h2>
-        <ol class="poise">
-          ${poise.map(([letter, word]) => `<li><span class="poise-letter">${letter}</span><span class="poise-word">${word}</span></li>`).join("")}
-        </ol>
+        ${poiseFeature("home-poise")}
         <div class="actions">${button("The Prestige Standard", "prestige-standard.html", "btn-ghost")}</div>
       </div>
     </section>
@@ -568,7 +736,7 @@ ${heroBlock({
           <div class="reveal">
             <p class="eyebrow">Learning model</p>
             <h2 class="section-title">Training That Goes Beyond the Lecture</h2>
-            <p class="lead mt-6">See the skill. Learn why it matters. Practice it. Then show you can do it.</p>
+            <p class="lead mt-6">Prestige training is designed around observable professional behavior. Participants see the skill, understand the reason, practice the technique and demonstrate what they can do.</p>
           </div>
         </div>
         <ol class="method-row reveal">
@@ -599,7 +767,7 @@ ${heroBlock({
         </div>
         <div class="founder-copy reveal">
           <p class="eyebrow">Founder &amp; Chief Executive Officer</p>
-          <h2 class="section-title title-wide">Meet Nonceba Wimbley — Founder &amp; Chief Executive Officer</h2>
+          <h2 class="section-title title-wide">Meet Nonceba Wimbley</h2>
           <blockquote class="founder-quote mt-8">Hospitality is making people feel genuinely welcomed, valued, respected, and cared for—not simply served.</blockquote>
           <div class="actions">${button("Meet Our Founder", "about.html")}</div>
         </div>
@@ -608,7 +776,7 @@ ${heroBlock({
 
 ${closing(
   "Ready to elevate your service standard?",
-  "Tell us what your team is experiencing. We start with discovery.",
+  "Tell us what your team is experiencing. Prestige will begin with discovery before recommending a program.",
   "Schedule a Discovery Consultation",
   "contact.html#discovery-form"
 )}
@@ -629,7 +797,7 @@ ${heroBlock({
   kicker: "Training Programs",
   title: "Professional Training Built Around the Guest Experience",
   titleClass: "compact",
-  lead: "From a focused reset to the Full Academy. Customized for your organization. The Prestige standard stays.",
+  lead: "From focused skill development to the complete Prestige Full Academy, programs can be customized around the needs of the organization while preserving the Prestige professional service standard.",
 })}
 
     <section class="section bg-ivory">
@@ -658,14 +826,14 @@ ${heroBlock({
       </div>
     </section>
 
-    <section class="section bg-ivory">
+    <section class="section bg-ivory" id="curriculum">
       <div class="wrap grid gap-12 min-[1000px]:grid-cols-12">
         <div class="min-[1000px]:col-span-4 reveal">
           <p class="eyebrow">Curriculum</p>
           <h2 class="section-title">Curriculum</h2>
           <p class="mt-6">Public module names only. Lesson plans and rubrics stay with the instructor.</p>
-          <div class="media-frame mt-8">
-            ${img("academy-training", "Hospitality professionals practicing glassware, plate and service-tool standards.", { sizes: "(min-width: 1000px) 32vw, 100vw" })}
+          <div class="media-frame curriculum-photo mt-8">
+            ${img("plate-service", "A server presenting a plated dish while holding a service cloth.", { position: "center 36%", sizes: "(min-width: 1000px) 32vw, 100vw" })}
           </div>
         </div>
         <div class="min-[1000px]:col-span-8 reveal">
@@ -676,7 +844,7 @@ ${heroBlock({
 
 ${closing(
   "Request a custom training proposal",
-  "Tell us what your team is experiencing. We start with discovery.",
+  "Tell us what your team is experiencing. Prestige will begin with discovery before recommending a program.",
   "Request a Custom Training Proposal",
   "contact.html#discovery-form"
 )}
@@ -691,49 +859,23 @@ const standard = layout({
   body: `
 ${heroBlock({
   page: true,
-  image: "table-setting",
-  alt: "A formal place setting with gold-rimmed china, glassware and folded linen.",
+  image: "coaching",
+  alt: "Practical coaching in plate presentation.",
+  position: "center 34%",
   kicker: "The Prestige Signature Standard™",
   title: "Service Is More Than a Task. It Is a Standard.",
-  lead: "How a professional presents, observes, acts, serves and elevates the guest experience.",
+  lead: "The Prestige Signature Standard™ defines how a professional presents, observes, acts, serves and elevates the guest experience.",
 })}
 
-    <section class="section bg-ink light-type">
+    <section class="section bg-ink light-type" id="poise">
       <div class="wrap reveal">
         <p class="eyebrow eyebrow-light">P.O.I.S.E. Method™</p>
         <h2 class="section-title sequence">Presence → Observe → Initiate → Serve → Elevate</h2>
-        <ol class="poise">
-          ${poise.map(([letter, word]) => `<li><span class="poise-letter">${letter}</span><span class="poise-word">${word}</span></li>`).join("")}
-        </ol>
+        ${poiseFeature("standard-poise")}
       </div>
     </section>
 
-    <section class="section bg-ivory">
-      <div class="wrap grid gap-10">
-        ${poise
-          .map(([letter, word, copy], index) => {
-            const visuals = [
-              ["founder-portrait", "Portrait of Nonceba Wimbley, Founder and Chief Executive Officer.", "center 18%"],
-              ["table-service", "A server speaking with guests at a dining table.", "center"],
-              ["coaching", "Nonceba Wimbley coaching a server on plate presentation at a set table.", "center"],
-              ["bottle-service", "A server presenting a wine bottle at a dining table.", "center 20%"],
-              ["fine-dining", "A server presenting plates to guests in a fine-dining room.", "center"],
-            ];
-            const [name, alt, position] = visuals[index];
-            return `<article class="sector-row${index % 2 ? " reverse" : ""}">
-            <div class="media-frame">${img(name, alt, { position, sizes: "(min-width: 900px) 52vw, 100vw" })}</div>
-            <div class="sector-copy">
-              <p class="eyebrow">${letter}</p>
-              <h2 class="section-title">${word}</h2>
-              <p class="lead mt-6">${copy}</p>
-            </div>
-          </article>`;
-          })
-          .join("\n        ")}
-      </div>
-    </section>
-
-    <section class="section bg-cream">
+    <section class="section bg-cream" id="method">
       <div class="wrap reveal">
         <p class="eyebrow">Instructional method</p>
         <h2 class="section-title title-wide">Exceptional service should be felt, not just taught.</h2>
@@ -746,12 +888,12 @@ ${heroBlock({
       </div>
     </section>
 
-    <section class="section bg-ivory">
+    <section class="section bg-ivory" id="client-standards">
       <div class="wrap grid gap-10 min-[900px]:grid-cols-2 min-[900px]:items-center">
         <div class="reveal">
           <p class="eyebrow">Client standards</p>
           <h2 class="section-title">Client SOP integration</h2>
-          <p class="lead mt-6">We teach the professional standard, then layer in your approved procedures. We do not replace them.</p>
+          <p class="lead mt-6">Prestige teaches universal professional service standards. When working with an organization, approved client SOPs and brand requirements can be layered into the training so employees understand both the professional standard and how their employer expects it to be executed.</p>
         </div>
         <div class="media-frame reveal">
           ${img("training-room", "A Prestige training room prepared with glassware, place settings and service uniforms.", { sizes: "(min-width: 900px) 46vw, 100vw" })}
@@ -761,7 +903,7 @@ ${heroBlock({
 
 ${closing(
   "Ready to elevate your service standard?",
-  "Tell us what your team is experiencing. We start with discovery.",
+  "Tell us what your team is experiencing. Prestige will begin with discovery before recommending a program.",
   "Schedule a Discovery Consultation",
   "contact.html#discovery-form"
 )}
@@ -778,14 +920,14 @@ ${heroBlock({
   page: true,
   image: "credential-moment",
   alt: "A certificate presentation during a Prestige academy recognition moment.",
-  position: "center",
+  position: "center 20%",
   kicker: "Professional credential",
   title: "Prestige Signature Standard Professional Service Credential™",
   titleClass: "compact",
-  lead: "Earned in the Five-Day Full Academy: knowledge, practical skill and the capstone.",
+  lead: "A professional credential is earned through demonstrated knowledge, practical service skill and successful completion of the Five-Day Prestige Full Academy requirements.",
 })}
 
-    <section class="section bg-ivory">
+    <section class="section bg-ivory" id="requirements">
       <div class="wrap grid gap-12 min-[900px]:grid-cols-12">
         <div class="min-[900px]:col-span-5 reveal">
           <p class="eyebrow">Requirements</p>
@@ -802,27 +944,27 @@ ${heroBlock({
       </div>
     </section>
 
-    <section class="section bg-cream">
+    <section class="section bg-cream" id="certificate">
       <div class="wrap reveal">
         <h2 class="section-title title-wide">Certificate of Completion and the Professional Service Credential</h2>
         <div class="compare mt-8">
           <article>
             <h3 class="subhead">Certificate of Completion</h3>
-            <p class="mt-4">Confirms participation. It is not the professional credential.</p>
+            <p class="mt-4">Confirms participation or completion where applicable. It does not represent mastery of the Full Academy professional credential.</p>
           </article>
           <article class="compare-ink">
             <h3 class="subhead">Professional Service Credential</h3>
-            <p class="mt-4">Earned only when the Full Academy requirements are met.</p>
+            <p class="mt-4">Earned only by satisfying the Full Academy assessment and performance requirements.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="section bg-ivory">
+    <section class="section bg-ivory" id="renewal">
       <div class="wrap reveal">
         <p class="eyebrow">Validity and renewal</p>
         <h2 class="section-title">Validity and renewal</h2>
-        <p class="mt-6 max-w-3xl">Valid for two years. Public verification is not available yet.</p>
+        <p class="mt-6 max-w-3xl">The credential is valid for two years. A future registry will use unique credential numbers.</p>
         <table class="data-table mt-8">
           <thead>
             <tr><th scope="col">Path</th><th scope="col">Fee</th></tr>
@@ -860,7 +1002,7 @@ ${heroBlock({
         <div class="reveal">
           <p class="eyebrow">Your Standards + The Prestige Standard</p>
           <h2 class="section-title">Your Standards + The Prestige Standard</h2>
-          <p class="lead mt-6">We do not replace your procedures. We teach the professional foundation, then your standards where they apply.</p>
+          <p class="lead mt-6">Prestige does not replace a client’s approved operating procedures. We teach the professional service foundation and, where appropriate, integrate the organization’s SOPs, brand expectations and service sequence into the learning experience.</p>
         </div>
         <div class="media-frame reveal">
           ${img("founder-meeting", "Nonceba Wimbley in a discovery conversation with hospitality leaders.", { sizes: "(min-width: 900px) 46vw, 100vw" })}
@@ -868,14 +1010,15 @@ ${heroBlock({
       </div>
     </section>
 
+    <nav class="sector-nav" aria-label="Hospitality sectors"><div class="wrap">${sectors.map(([id,title]) => `<a href="#${id}" data-sector-link>${title}</a>`).join("")}</div></nav>
     <section class="section bg-cream">
       <div class="wrap">
         ${sectors
           .map(([id, title, copy, image, alt, position], index) => `<article class="sector-row${index % 2 ? " reverse" : ""}" id="${id}">
           <div class="media-frame">${img(image, alt, { position, sizes: "(min-width: 900px) 52vw, 100vw" })}</div>
           <div class="sector-copy">
-            <h2 class="subhead">${title}</h2>
-            <p class="lead mt-5">${copy}</p>
+            <p class="eyebrow">0${index+1} / Who we serve</p><h2 class="section-title">${title}</h2>
+            <p class="lead mt-5">${copy}</p><div class="actions">${modalButton("Schedule a Discovery Consultation", "discovery", "btn-ink", { preset: { field: "industry", value: industryValues[index] } })}</div>
           </div>
         </article>`)
           .join("\n        ")}
@@ -884,7 +1027,7 @@ ${heroBlock({
 
 ${closing(
   "Ready to elevate your service standard?",
-  "Tell us what your team is experiencing. We start with discovery.",
+  "Tell us what your team is experiencing. Prestige will begin with discovery before recommending a program.",
   "Schedule a Discovery Consultation",
   "contact.html#discovery-form"
 )}
@@ -907,21 +1050,23 @@ ${heroBlock({
   lead: "Founder &amp; Chief Executive Officer of The Prestige Signature Standard Academy.",
 })}
 
-    <section class="section bg-ivory">
+    <section class="section bg-ivory" id="founder-story">
       <div class="wrap grid gap-12 min-[900px]:grid-cols-12">
         <div class="min-[900px]:col-span-4 reveal">
           <p class="eyebrow">Founder story</p>
           <h2 class="section-title">Founder story</h2>
         </div>
         <div class="prose min-[900px]:col-span-8 reveal">
-          <p>Nonceba Wimbley’s hospitality career began in Cape Town in late 2008. At 18, with no restaurant experience, she was hired on the spot at Ocean Basket. She went on to work as a waiter, bartender, hostess, assistant manager and Front of House Manager, in restaurants and at a game-reserve lodge.</p>
-          <p>Working across cultures taught her that hospitality cannot be a script. A professional needs the standard, and the judgment to see the guest in front of them.</p>
-          <p>She kept seeing the same gap: people were asked to deliver exceptional service without being shown what it looks like. The Academy exists to close that gap.</p>
+          <p>Nonceba Wimbley’s hospitality journey began in Cape Town, South Africa, in late 2008, when she was 18 and straight out of high school. With no restaurant experience, she walked into Ocean Basket, sold herself on the opportunity and was hired on the spot.</p>
+          <p>That opportunity became the beginning of a career in customer service and hospitality that has included work as a waiter, bartender, hostess, assistant manager and Front of House Manager, as well as experience in restaurants and a game-reserve lodge. Along the way, Nonceba trained and supervised employees, managed front-of-house operations and handled the moments that shape how guests remember an experience.</p>
+          <p>Growing up and working in South Africa exposed her to different cultures, personalities, accents, beliefs, expectations and ways of communicating. It taught her that exceptional hospitality cannot be reduced to a script. A professional must know the standard—and also know how to see the individual guest in front of them.</p>
+          <p>Prestige grew from something Nonceba kept noticing: employees were often expected to deliver exceptional service without ever being fully taught what exceptional service looks, sounds and feels like. Poor greetings. Incorrect glassware. Improper plate handling. Dirty tables left unattended. Staff talking or eating around guests. A lack of presence and awareness.</p>
+          <p>The Prestige Signature Standard Academy was created to change that—to give hospitality professionals the training, tools, practice and confidence to become polished professionals who understand that service is not simply a transaction. It is an experience.</p>
         </div>
       </div>
     </section>
 
-    <section class="bg-ink">
+    <section class="bg-ink" id="philosophy">
       <div class="grid min-[900px]:grid-cols-2">
         <div class="media-frame bleed-media">
           ${img("founder-standing", "Nonceba Wimbley, Founder and Chief Executive Officer, in a hospitality lobby.", { position: "center 10%", sizes: "(min-width: 900px) 50vw, 100vw" })}
@@ -940,13 +1085,13 @@ ${heroBlock({
 
     <section class="section bg-ivory">
       <div class="wrap grid gap-8 min-[900px]:grid-cols-2">
-        <article class="reveal">
+        <article class="reveal" id="mission">
           <h2 class="subhead">Mission</h2>
-          <p class="lead mt-5">Give hospitality professionals the skill, presence and standards to create exceptional guest experiences, and help organizations build stronger teams.</p>
+          <p class="lead mt-5">The Prestige Signature Standard Academy equips hospitality professionals with the skills, confidence, professional presence and service standards needed to create exceptional guest experiences while helping organizations build stronger service cultures and better-prepared teams.</p>
         </article>
-        <article class="reveal">
+        <article class="reveal" id="vision">
           <h2 class="subhead">Vision</h2>
-          <p class="lead mt-5">Establish the Prestige Signature Standard™ as a recognized standard of professional hospitality service.</p>
+          <p class="lead mt-5">To establish the Prestige Signature Standard™ as a recognized standard of professional hospitality service and build an academy whose impact can be seen in stronger professionals, stronger businesses and unforgettable guest experiences.</p>
         </article>
       </div>
       <div class="wrap mt-12">
@@ -958,7 +1103,7 @@ ${heroBlock({
 
 ${closing(
   "Ready to elevate your service standard?",
-  "Tell us what your team is experiencing. We start with discovery.",
+  "Tell us what your team is experiencing. Prestige will begin with discovery before recommending a program.",
   "Schedule a Discovery Consultation",
   "contact.html#discovery-form"
 )}
@@ -978,7 +1123,7 @@ ${heroBlock({
   kicker: "Discovery",
   title: "Let’s Talk About Your Service Experience.",
   titleClass: "compact",
-  lead: "Where the team is today, and where service breaks down. Discovery comes before a recommendation.",
+  lead: "Tell us where your team is today, what you want guests to experience and where service feels inconsistent. Prestige begins with discovery before recommending a training solution.",
   actions: modalButton("Schedule a Discovery Consultation", "discovery", "btn-light"),
 })}
 
@@ -995,8 +1140,7 @@ ${heroBlock({
         </div>
         <div class="min-[1000px]:col-span-8 reveal">
           <h2 class="subhead">Begin with discovery</h2>
-          <p class="lead mt-5">The form opens here. Nothing is sent yet. Call or email if you prefer.</p>
-          <div class="actions">${modalButton("Schedule a Discovery Consultation", "discovery")}</div>
+          <div id="discovery-form" class="inline-form">${formMarkup("discovery", "page-discovery")}</div>
         </div>
       </div>
     </section>
@@ -1012,10 +1156,11 @@ const enrollment = layout({
 ${heroBlock({
   page: true,
   image: "academy-training",
+  position: "center 20%",
   alt: "Hospitality professionals practicing glassware, plate and service-tool standards.",
   kicker: "Open Enrollment",
   title: "Professional Development. The Prestige Standard.",
-  lead: "No dates are set. Join the list and we will be in touch when a class is confirmed.",
+  lead: "Register your interest in professional hospitality training. Session dates are announced once officially scheduled.",
   actions: modalButton("Join the Interest List", "enrollment", "btn-light"),
 })}
 
@@ -1032,13 +1177,13 @@ ${heroBlock({
         </div>
         <div class="reveal" data-session-list>
           <h2 class="subhead">Upcoming sessions</h2>
-          <p class="lead mt-5">No sessions yet. Join the interest list to be contacted when a date is confirmed.</p>
+          <p class="lead mt-5">No sessions are currently scheduled. Contact Prestige to express your interest in a future class.</p>
           <div class="actions">${modalButton("Join the Interest List", "enrollment", "btn-ghost-ink")}</div>
         </div>
       </div>
     </section>
 
-    <section class="section bg-cream">
+    <section class="section bg-cream" id="pricing">
       <div class="wrap reveal">
         <h2 class="section-title">Per-person pricing</h2>
         <table class="data-table mt-8">
@@ -1058,11 +1203,89 @@ ${heroBlock({
     <section class="section bg-ivory" id="interest">
       <div class="wrap reveal">
         <h2 class="subhead">Interest list</h2>
-        <p class="lead mt-5">How to reach you, and which program you want. Nothing is sent yet.</p>
-        <div class="actions">${modalButton("Join the Interest List", "enrollment")}</div>
+        <div id="interest-form" class="inline-form">${formMarkup("enrollment", "page-enrollment")}</div>
       </div>
     </section>
 `,
+});
+
+const policyDate = "September 24, 2026";
+
+function legalPage({ file, title, description, kicker, heading, lead, sections }) {
+  const related = [
+    ["privacy.html", "Privacy"],
+    ["terms.html", "Terms"],
+    ["accessibility.html", "Accessibility"],
+  ].filter(([href]) => href !== file);
+  return layout({
+    file,
+    title,
+    description,
+    path: `/${file}`,
+    body: `
+    <section class="section bg-ivory">
+      <div class="wrap legal-wrap">
+        <p class="eyebrow">${kicker}</p>
+        <h1 class="page-title compact">${heading}</h1>
+        <p class="lead mt-5">${lead}</p>
+        <p class="legal-date">${policyDate}</p>
+        <div class="prose legal-prose">
+          ${sections.map(([headingText, copy]) => `<h2>${headingText}</h2>${copy}`).join("\n          ")}
+        </div>
+        <nav class="legal-related" aria-label="Related policies">
+          ${related.map(([href, label]) => `<a href="${href}">${label}</a>`).join("")}
+        </nav>
+      </div>
+    </section>
+`,
+  });
+}
+
+const privacy = legalPage({
+  file: "privacy.html",
+  title: "Privacy | Prestige Signature Standard Academy",
+  description: "How The Prestige Signature Standard Academy website handles inquiries. Forms on this site do not send yet.",
+  kicker: "Privacy",
+  heading: "Privacy",
+  lead: "This page describes what this website collects, and what it does not.",
+  sections: [
+    ["Who operates this site", `<p>The Prestige Signature Standard Academy operates this website from Bryant, Arkansas. Questions about privacy can go to <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a> or <a href="tel:+15015595118">501-559-5118</a>.</p>`],
+    ["What the forms ask for", `<p>The discovery form asks for name, company, title, email, phone, industry, number of people to train, city and state, training interest, desired timing, and an optional note about the current service challenge. It also asks for permission to be contacted about that inquiry.</p><p>The open-enrollment interest form asks for name, email, phone, city and state, employer or role, program interest, preferred timeframe, and agreement to be contacted about open enrollment.</p><p>Each form includes a hidden field used to filter automated submissions, and may record which page the form was opened from.</p>`],
+    ["Forms on this website do not send yet", `<p>Online submission is still being connected. Completing a form on this website does not send the inquiry and does not store it with the academy. To reach Prestige now, call or email.</p>`],
+    ["If submission is connected later", `<p>Information from a discovery inquiry would be used to reply and to discuss training. Information from the interest list would be used to contact that person about a future class. Prestige does not sell personal information and does not use it for unrelated advertising.</p>`],
+    ["What this site does not do", `<p>This website has no accounts, no online checkout, and no card payment. It does not use advertising or analytics cookies. Fonts are served from this website.</p><p>The service that hosts the site may keep ordinary connection records, such as an IP address, browser type, and the page requested, in order to operate and protect the site.</p>`],
+    ["Children", `<p>This website is for hospitality organizations and professionals. It is not directed to children, and the academy does not knowingly collect information from children.</p>`],
+  ],
+});
+
+const terms = legalPage({
+  file: "terms.html",
+  title: "Terms | Prestige Signature Standard Academy",
+  description: "Terms for using The Prestige Signature Standard Academy website. A training engagement is confirmed separately.",
+  kicker: "Terms",
+  heading: "Terms",
+  lead: "These terms cover use of this website. A training engagement is confirmed separately.",
+  sections: [
+    ["The website is not a booking", `<p>The pages describe professional hospitality service training. Sending a discovery inquiry or joining the interest list is a request for contact. It does not reserve a date, confirm a cohort, or create a training agreement.</p><p>Open enrollment dates are announced only after a session is officially scheduled. A standard class needs at least 8 paid participants and holds no more than 25.</p>`],
+    ["Prices", `<p>Private training is priced per cohort of up to 25 participants. The starting prices are on the <a href="training-programs.html">Training Programs</a> page. A customized program is discussed after discovery.</p><p>Open enrollment is priced per person. Those prices are on the <a href="open-enrollment.html#pricing">Open Enrollment</a> page. This website does not take payment.</p><p>Credential renewal fees are on the <a href="professional-credential.html#renewal">Professional Credential</a> page.</p>`],
+    ["The credential", `<p>The Prestige Signature Standard Professional Service Credential™ is earned only by meeting the published Five-Day Full Academy requirements, including attendance, knowledge, practical assessment, and the Module 15 capstone. A certificate of completion is not that credential. The credential is valid for two years.</p>`],
+    ["Names and materials", `<p>The Prestige Signature Standard™ and the P.O.I.S.E. Method™ name the academy’s standard and teaching sequence. Text, photographs, and training descriptions on this site are for learning about the academy. They are not a license to copy the curriculum or present it as someone else’s program.</p>`],
+    ["Using the site", `<p>Use the site to read about the academy and to request contact. Do not attempt to disrupt the site, or submit another person’s information without permission to do so.</p><p>Prestige may update these pages. The date at the top is the current version. Questions can go to <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a>.</p>`],
+  ],
+});
+
+const accessibility = legalPage({
+  file: "accessibility.html",
+  title: "Accessibility | Prestige Signature Standard Academy",
+  description: "How to use The Prestige Signature Standard Academy website, and how to report a barrier.",
+  kicker: "Accessibility",
+  heading: "Accessibility",
+  lead: "The academy site is built so the training information can be read, reached, and used.",
+  sections: [
+    ["How the pages are built", `<p>Pages use headings, labeled form fields, and links that can be followed with a keyboard. The discovery form and the interest form can be opened from any page. Menus can be opened with a keyboard, and Escape closes the desktop menu.</p>`],
+    ["A form on this site does not send", `<p>Online submission is still being connected. If a form cannot be completed, call <a href="tel:+15015595118">501-559-5118</a> or email <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a>. Those are the working ways to reach the academy.</p>`],
+    ["If something blocks you", `<p>Email the academy, name the page, and describe what got in the way. Prestige will use that to correct the page.</p>`],
+  ],
 });
 
 const missing = layout({
@@ -1095,11 +1318,14 @@ const pages = [
   ["about.html", about],
   ["contact.html", contact],
   ["open-enrollment.html", enrollment],
+  ["privacy.html", privacy],
+  ["terms.html", terms],
+  ["accessibility.html", accessibility],
   ["404.html", missing],
 ];
 
 const root = process.cwd();
 for (const [file, html] of pages) {
-  await writeFile(path.join(root, file), html);
+  await writeFile(path.join(root, file), html.replace(/[ \t]+$/gm, ""));
   console.log("wrote", file);
 }
