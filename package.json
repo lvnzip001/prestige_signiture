@@ -7,8 +7,12 @@
     "images": "node scripts/optimize-images.mjs",
     "build:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/site.css --minify",
     "watch:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/site.css --watch",
-    "build": "npm run images && npm run build:css",
+    "build": "npm run build:css",
     "dev": "npx --yes serve . -p 4173"
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.5.1": true,
+    "sharp@0.34.5": true
   },
   "devDependencies": {
     "@fontsource/cormorant-garamond": "^5.2.8",
