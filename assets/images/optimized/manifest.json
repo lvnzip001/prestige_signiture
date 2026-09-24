@@ -1,0 +1,167 @@
+{
+  "hero-training": {
+    "width": 1536,
+    "height": 1024,
+    "widths": [
+      640,
+      960,
+      1400
+    ],
+    "file": "ceo_training_waiters_2.jpg"
+  },
+  "founder-portrait": {
+    "width": 1086,
+    "height": 1448,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "CEO2.jpg"
+  },
+  "founder-standing": {
+    "width": 1024,
+    "height": 1536,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "CEO.jpg"
+  },
+  "coaching": {
+    "width": 1312,
+    "height": 1199,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "Ceo_waiter_traing.jpg"
+  },
+  "founder-meeting": {
+    "width": 1536,
+    "height": 1024,
+    "widths": [
+      640,
+      960,
+      1400
+    ],
+    "file": "Ceo_in_meeting.jpg"
+  },
+  "fine-dining": {
+    "width": 1371,
+    "height": 1148,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "PHOTO-2026-09-18-13-54-59.jpg"
+  },
+  "table-setting": {
+    "width": 1312,
+    "height": 1199,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "table_setting.jpg"
+  },
+  "place-setting": {
+    "width": 1371,
+    "height": 1148,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "waiter_setting_table.jpg"
+  },
+  "table-service": {
+    "width": 1312,
+    "height": 1199,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "waiter_serving.jpg"
+  },
+  "plate-service": {
+    "width": 1024,
+    "height": 1536,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "male_waiter_serving.jpg"
+  },
+  "club-service": {
+    "width": 1024,
+    "height": 1536,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "waiter_outside.jpg"
+  },
+  "beverage-service": {
+    "width": 1370,
+    "height": 1148,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "bartender.jpg"
+  },
+  "bottle-service": {
+    "width": 1086,
+    "height": 1448,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "waiter_wine_bottle.jpg"
+  },
+  "credential-moment": {
+    "width": 1370,
+    "height": 1148,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "waiter_award.jpg"
+  },
+  "academy-training": {
+    "width": 1370,
+    "height": 1148,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "waiter_training.jpg"
+  },
+  "service-team": {
+    "width": 1024,
+    "height": 1536,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "waiters.jpg"
+  },
+  "hospitality-professional": {
+    "width": 1024,
+    "height": 1536,
+    "widths": [
+      640,
+      960
+    ],
+    "file": "woman waiter.jpg"
+  },
+  "training-room": {
+    "width": 1536,
+    "height": 1024,
+    "widths": [
+      640,
+      960,
+      1400
+    ],
+    "file": "meeting_setting.jpg"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "prestige-signature-standard-academy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Phase 1 website for The Prestige Signature Standard Academy",
+  "scripts": {
+    "images": "node scripts/optimize-images.mjs",
+    "build:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/site.css --minify",
+    "watch:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/site.css --watch",
+    "build": "npm run images && npm run build:css",
+    "dev": "npx --yes serve . -p 4173"
+  },
+  "devDependencies": {
+    "@fontsource/cormorant-garamond": "^5.2.8",
+    "@fontsource/manrope": "^5.2.8",
+    "@tailwindcss/cli": "^4.1.13",
+    "sharp": "^0.34.4",
+    "tailwindcss": "^4.1.13"
+  }
+}
