@@ -26,7 +26,7 @@ export function bookingMarkup(kind, mode = BOOKING_CONFIG.paymentMode) {
           <div class="calendar-weekdays" aria-hidden="true"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
           <div class="calendar-grid" data-calendar aria-label="Available training start dates"></div>
           <p class="calendar-key"><span></span> Available start date <span class="key-selected"></span> Your selection <span class="key-full"></span> Full or closed</p>
-          <div class="calendar-detail" data-date-detail aria-label="Training dates this month"></div>
+          <div class="calendar-detail" data-date-detail aria-label="Training dates by week"></div>
           <p class="booking-service-message" data-availability-message role="status">Checking training availability…</p>
           <div data-session-options class="session-options"></div>
         </fieldset>

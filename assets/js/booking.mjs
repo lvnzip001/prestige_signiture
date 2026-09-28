@@ -67,6 +67,9 @@ if (root) {
   let selected = null;
   let selectedDate = null;
   let slots = [];
+  let openWeeks = new Set();
+  let detailMonth = '';
+  let weeksReady = false;
   let generation = 0;
   let submitting = false;
   function summary() {
@@ -126,40 +129,94 @@ if (root) {
     const state = slot.status === 'available' && slot.remaining > 0 ? (kind === 'enrollment' ? `${slot.remaining} of 25 seats open` : 'Open for your team') : slot.status === 'full' ? 'Full' : 'Closed';
     return `${name}${time}${range} · ${state}`;
   }
+  const weekdayLong = iso => new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: 'UTC' }).format(new Date(`${iso}T12:00:00Z`));
+  const weekdayShort = iso => new Intl.DateTimeFormat('en-US', { weekday: 'short', timeZone: 'UTC' }).format(new Date(`${iso}T12:00:00Z`));
+  const monthDay = iso => new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }).format(new Date(`${iso}T12:00:00Z`));
+  const slotOpen = slot => slot.status === 'available' && slot.remaining > 0;
+  function weekKey(iso) {
+    const date = new Date(`${iso}T12:00:00Z`);
+    const mondayOffset = date.getUTCDay() === 0 ? -6 : 1 - date.getUTCDay();
+    date.setUTCDate(date.getUTCDate() + mondayOffset);
+    return date.toISOString().slice(0, 10);
+  }
   function renderDateDetail() {
     const list = $('[data-date-detail]');
     list.replaceChildren();
+    if (detailMonth !== month) { openWeeks = new Set(); detailMonth = month; weeksReady = false; }
     const byDate = new Map();
     for (const slot of slots) {
       if (!byDate.has(slot.date)) byDate.set(slot.date, []);
       byDate.get(slot.date).push(slot);
     }
+    const weeks = new Map();
     for (const [date, daySlots] of byDate) {
-      const open = daySlots.some(slot => slot.status === 'available' && slot.remaining > 0);
-      const row = document.createElement('button');
-      row.type = 'button';
-      row.className = 'calendar-detail-row';
-      row.disabled = !open || submitting;
-      const when = document.createElement('span');
-      when.className = 'calendar-detail-date';
-      const weekday = document.createElement('strong');
-      weekday.textContent = new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: 'UTC' }).format(new Date(`${date}T12:00:00Z`));
-      const sub = document.createElement('span');
-      sub.textContent = formatDate(date);
-      when.append(weekday, sub);
-      const body = document.createElement('span');
-      body.className = 'calendar-detail-sessions';
-      daySlots.forEach(slot => {
-        const line = document.createElement('span');
-        line.textContent = detailLine(slot);
-        if (!(slot.status === 'available' && slot.remaining > 0)) line.className = 'is-full';
-        body.append(line);
+      const key = weekKey(date);
+      if (!weeks.has(key)) weeks.set(key, []);
+      weeks.get(key).push({ date, slots: daySlots, open: daySlots.some(slotOpen) });
+    }
+    const weekEntries = [...weeks.entries()];
+    if (!weeksReady && weekEntries.length) {
+      const firstOpen = weekEntries.find(([, days]) => days.some(day => day.open));
+      if (firstOpen) openWeeks.add(firstOpen[0]);
+      weeksReady = true;
+    }
+    if (selectedDate && weeks.has(weekKey(selectedDate))) openWeeks.add(weekKey(selectedDate));
+    for (const [key, days] of weekEntries) {
+      const openDays = days.filter(day => day.open);
+      const status = !openDays.length ? 'Full' : openDays.length === days.length && openDays.every(day => day.slots.every(slotOpen)) ? 'Open all week' : `${openDays.length} open · ${openDays.map(day => weekdayShort(day.date)).join(', ')}`;
+      const details = document.createElement('details');
+      details.className = 'calendar-week';
+      if (!openDays.length) details.classList.add('is-full');
+      details.open = openWeeks.has(key);
+      const summary = document.createElement('summary');
+      const range = document.createElement('span');
+      range.className = 'calendar-week-range';
+      const title = document.createElement('strong');
+      title.textContent = days.length === 1 ? monthDay(days[0].date) : `${monthDay(days[0].date)} – ${monthDay(days.at(-1).date)}`;
+      const count = document.createElement('span');
+      count.textContent = `${days.length} training ${days.length === 1 ? 'day' : 'days'}`;
+      range.append(title, count);
+      const badge = document.createElement('span');
+      badge.className = 'calendar-week-status';
+      badge.textContent = status;
+      summary.append(range, badge);
+      const panel = document.createElement('div');
+      panel.className = 'calendar-week-days';
+      days.forEach(day => {
+        const row = document.createElement(day.open ? 'button' : 'div');
+        row.className = 'calendar-detail-row';
+        if (day.open) {
+          row.type = 'button';
+          row.disabled = submitting;
+          row.setAttribute('aria-pressed', String(selectedDate === day.date));
+          row.addEventListener('click', () => chooseDay(day.date));
+        }
+        const when = document.createElement('span');
+        when.className = 'calendar-detail-date';
+        const weekday = document.createElement('strong');
+        weekday.textContent = weekdayLong(day.date);
+        const sub = document.createElement('span');
+        sub.textContent = formatDate(day.date);
+        when.append(weekday, sub);
+        const body = document.createElement('span');
+        body.className = 'calendar-detail-sessions';
+        day.slots.forEach(slot => {
+          const line = document.createElement('span');
+          line.textContent = detailLine(slot);
+          if (!slotOpen(slot)) line.className = 'is-full';
+          body.append(line);
+        });
+        row.append(when, body);
+        panel.append(row);
       });
-      row.append(when, body);
-      row.setAttribute('aria-label', `${weekday.textContent}, ${formatDate(date)}. ${daySlots.map(detailLine).join('. ')}`);
-      row.setAttribute('aria-pressed', String(selectedDate === date));
-      row.addEventListener('click', () => chooseDay(date));
-      list.append(row);
+      summary.addEventListener('click', event => {
+        event.preventDefault();
+        details.open = !details.open;
+        if (details.open) openWeeks.add(key);
+        else openWeeks.delete(key);
+      });
+      details.append(summary, panel);
+      list.append(details);
     }
   }
   function chooseDay(date) {
