@@ -14,7 +14,7 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: "npx --yes serve . -l tcp://127.0.0.1:4175 --no-clipboard",
+    command: "node scripts/serve.mjs 4175",
     url: "http://127.0.0.1:4175",
     reuseExistingServer: false,
     timeout: 60000,

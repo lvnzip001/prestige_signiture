@@ -1,0 +1,9 @@
+// Approved Round 2 catalogue. Prices are USD; never accept prices from a browser.
+export const PROGRAMS = [
+  { id: 'half-day', name: 'Half-Day', title: 'Half-Day Customized Training', days: 1, halfDay: true, private: 3750, enrollment: 300, benefit: 'Focused skills. Immediate confidence.', links: { deposit: 'https://buy.stripe.com/7sY3CvcUCEYqaPG1tX2VG00', full: 'https://buy.stripe.com/4gMaEX7Ai2bEbTK0pT2VG01', enrollment: 'https://buy.stripe.com/5kQ6oH8EmcQi0b2c8B2VG08' } },
+  { id: 'full-day', name: 'Full-Day', title: 'Full-Day Customized Training', days: 1, private: 6000, enrollment: 500, benefit: 'A stronger standard across every interaction.', links: { deposit: 'https://buy.stripe.com/eVqeVdaMu2bE1f6dcF2VG02', full: 'https://buy.stripe.com/cNiaEX2fY5nQ8HygoR2VG03', enrollment: 'https://buy.stripe.com/cNi8wP5sa03wf5W60h2VG09' } },
+  { id: 'two-day', name: 'Two-Day Signature', title: 'Two-Day Signature Program', days: 2, private: 10000, enrollment: 900, benefit: 'Refine technique, judgment and guest experience.', links: { deposit: 'https://buy.stripe.com/8x214n4o63fIf5WgoR2VG04', full: 'https://buy.stripe.com/3cI14ng60g2u0b26Oh2VG05', enrollment: 'https://buy.stripe.com/eVq6oHcUC03we1Sc8B2VG0a' } },
+  { id: 'full-academy', name: 'Five-Day Full Academy', title: 'Five-Day Prestige Full Academy', days: 5, private: 35000, enrollment: 3200, benefit: 'Complete development. A professional credential pathway.', links: { deposit: 'https://buy.stripe.com/8x2f7hb0v3fI0b2fkN2VG06', full: 'https://buy.stripe.com/dRmaEX9Iq2bEf5WdcF2VG07', enrollment: 'https://buy.stripe.com/00waEX1bU9E60b27S12VG0b' } },
+];
+export const money = value => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+export const OPENING_DATE = '2026-11-02';

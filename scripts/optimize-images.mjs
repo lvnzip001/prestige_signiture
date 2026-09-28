@@ -66,20 +66,13 @@ for (const [file, name] of photos) {
 
 await copyFile(path.join(sourceDir, "logo.png"), path.join(originalsDir, "logo.png"));
 await copyFile(path.join(sourceDir, "logo_main.png"), path.join(originalsDir, "logo_main.png"));
-const logoMain = sharp(path.join(sourceDir, "logo_main.png")).trim({ threshold: 12 });
-await logoMain.clone().png().toFile(path.join(optimizedDir, "logo-main.png"));
-await logoMain.clone().resize({ width: 480, withoutEnlargement: true }).webp({ quality: 82 }).toFile(path.join(optimizedDir, "logo.webp"));
-const logoMeta = await sharp(path.join(optimizedDir, "logo.webp")).metadata();
+// The client-approved master is used byte-for-byte by the website.
+// Only browser icon derivatives are resized, always with the complete artwork.
+const brandMaster = path.join(root, "assets/images/brand-master.jpg");
+const logoMeta = await sharp(brandMaster).metadata();
 manifest.logo = { width: logoMeta.width, height: logoMeta.height };
-await sharp(path.join(optimizedDir, "logo-main.png"))
-  .extract({ left: 560, top: 0, width: 500, height: 500 })
-  .resize(180, 180)
-  .png()
-  .toFile(path.join(iconsDir, "apple-touch-icon.png"));
-await sharp(path.join(iconsDir, "apple-touch-icon.png"))
-  .resize(32, 32)
-  .png()
-  .toFile(path.join(iconsDir, "favicon-32.png"));
+await sharp(brandMaster).resize(180, 180, { fit: "contain", background: "#000000" }).png().toFile(path.join(iconsDir, "apple-touch-icon.png"));
+await sharp(brandMaster).resize(32, 32, { fit: "contain", background: "#000000" }).png().toFile(path.join(iconsDir, "favicon-32.png"));
 
 await sharp(path.join(sourceDir, "ceo_training_waiters_2.jpg"))
   .rotate()

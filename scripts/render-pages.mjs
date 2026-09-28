@@ -1,5 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { bookingMarkup, trainingPaths } from './booking-markup.mjs';
+import { PROGRAMS } from '../assets/js/programs.mjs';
 
 const arrow = `<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 8h11M9 3.5 13.5 8 9 12.5"/></svg>`;
 
@@ -23,12 +25,14 @@ const menus = [
     label: "Training Programs",
     overview: "All programs",
     lead: "Private cohorts of up to 25.",
-    feature: ["training-programs.html", "hero-training", "A training session with hospitality professionals around a whiteboard.", "All programs", "Starting prices, per cohort."],
+    feature: ["training-programs.html", "hero-training", "A training session with hospitality professionals around a whiteboard.", "All programs", "Professional development for your team."],
     items: [
-      ["training-programs.html#half-day", "Half-Day", "Starting at $3,750."],
-      ["training-programs.html#full-day", "Full-Day", "Starting at $6,000."],
-      ["training-programs.html#two-day", "Two-Day Signature", "Starting at $10,000."],
-      ["training-programs.html#full-academy", "Five-Day Full Academy", "Starting at $35,000. Credential pathway."],
+      ["training-programs.html#half-day", "Half-Day", "Focused skills and refresher training."],
+      ["training-programs.html#full-day", "Full-Day", "A stronger service standard."],
+      ["training-programs.html#two-day", "Two-Day Signature", "Technical and guest-experience development."],
+      ["training-programs.html#full-academy", "Five-Day Full Academy", "Comprehensive development. Credential pathway."],
+      ["private-training.html#booking", "Book private training", "Choose your program and training dates."],
+      ["open-enrollment.html#booking", "Training for myself", "Individual professional development."],
       ["training-programs.html#curriculum", "Curriculum", "Fifteen modules, from presence to the capstone."],
     ],
   },
@@ -100,12 +104,12 @@ const menus = [
     overview: "Academy contact",
     mark: ["open-enrollment.html"],
     lead: `Bryant, Arkansas · <a href="tel:+15015595118">501-559-5118</a>`,
-    feature: ["open-enrollment.html", "academy-training", "Hospitality professionals practicing glassware, plate and service-tool standards.", "Open Enrollment", "Dates are announced only after a session is scheduled."],
+    feature: ["open-enrollment.html", "academy-training", "Hospitality professionals practicing glassware, plate and service-tool standards.", "Open Enrollment", "Training begins November 2, 2026."],
     items: [
       ["contact.html#discovery-form", "Discovery consultation", "Tell us where your team is today.", "discovery"],
-      ["open-enrollment.html", "Open Enrollment", "Per person, once a class is confirmed. From $300."],
+      ["open-enrollment.html", "Open Enrollment", "Choose your program. Develop your potential."],
       ["open-enrollment.html#pricing", "Per-person pricing", "Half-Day $300 through Full Academy $3,200."],
-      ["open-enrollment.html#interest-form", "Interest list", "Be contacted when a session is scheduled.", "enrollment"],
+      ["open-enrollment.html#booking", "View available training", "Programs, dates and individual registration."],
     ],
   },
 ];
@@ -129,8 +133,8 @@ function modalButton(label, modal, variant = "btn-ink", options = {}) {
   const mark = options.arrow === false ? "" : arrow;
   const preset = options.preset;
   const query = preset ? `?${new URLSearchParams({ [preset.field]: preset.value })}` : "";
-  const href = modal === "discovery" ? `contact.html${query}#discovery-form` : `open-enrollment.html${query}#interest-form`;
-  return `<a class="btn ${variant}" href="${href}" data-open-modal="${modal}">${label}${mark}</a>`;
+  const href = modal === "discovery" ? `contact.html${query}#discovery-form` : `open-enrollment.html${query}#booking`;
+  return `<a class="btn ${variant}" href="${href}"${modal === "discovery" ? ' data-open-modal="discovery"' : ''}>${label}${mark}</a>`;
 }
 
 function menuItem(item) {
@@ -170,7 +174,7 @@ function header(activeFile) {
   return `<header class="site-header" data-header>
     <div class="header-inner">
       <a class="brand" href="index.html">
-        <img src="assets/images/optimized/logo.webp" width="${photos.logo.width}" height="${photos.logo.height}" alt="The Prestige Signature Standard Academy">
+        <img src="assets/images/brand-master.jpg" width="1536" height="1024" alt="The Prestige Signature Standard Academy">
       </a>
       <nav class="desktop-nav" aria-label="Primary">
         ${desktop}
@@ -197,7 +201,7 @@ function footer(activeFile) {
   return `<footer class="site-footer">
     <div class="wrap footer-grid">
       <div class="footer-brand stack">
-        <img src="assets/images/optimized/logo.webp" width="${photos.logo.width}" height="${photos.logo.height}" alt="The Prestige Signature Standard Academy">
+        <img src="assets/images/brand-master.jpg" width="1536" height="1024" alt="The Prestige Signature Standard Academy">
         <p>Professional Hospitality Service Training</p>
         <p>The Prestige Signature Standard™<br>P.O.I.S.E. Method™</p>
         <p>Bryant, Arkansas</p>
@@ -213,6 +217,7 @@ function footer(activeFile) {
       <nav class="footer-nav" aria-label="Training">
         <p class="footer-label">Training</p>
         <a${here("training-programs.html")} href="training-programs.html">Training Programs</a>
+        <a${here("private-training.html")} href="private-training.html">Private Training Booking</a>
         <a href="training-programs.html#half-day">Half-Day</a>
         <a href="training-programs.html#full-day">Full-Day</a>
         <a href="training-programs.html#two-day">Two-Day Signature</a>
@@ -248,6 +253,7 @@ function layout({ file, title, description, path: urlPath, body }) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${title}</title>
   <meta name="description" content="${description}">
+  ${['booking-confirmation.html', '404.html'].includes(file) ? '<meta name="robots" content="noindex, follow">' : ''}
   <link rel="canonical" href="${url}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="The Prestige Signature Standard Academy">
@@ -271,7 +277,7 @@ function layout({ file, title, description, path: urlPath, body }) {
     "@type": "EducationalOrganization",
     "name": "The Prestige Signature Standard Academy",
     "url": "https://prestigesignaturestandard.com/",
-    "logo": "https://prestigesignaturestandard.com/assets/images/optimized/logo-main.png",
+    "logo": "https://prestigesignaturestandard.com/assets/images/brand-master.jpg",
     "email": "nwimbley@prestigesignaturestandard.com",
     "telephone": "+1-501-559-5118",
     "description": "Professional hospitality service training for restaurants, hotels, clubs and event teams.",
@@ -299,6 +305,7 @@ ${body}
   ${footer(file)}
   ${modals()}
   <script src="assets/js/main.js" defer></script>
+  ${['open-enrollment.html', 'private-training.html', 'booking-confirmation.html'].includes(file) ? '<script type="module" src="assets/js/booking.mjs"></script>' : ''}
 </body>
 </html>
 `;
@@ -330,12 +337,13 @@ function closing(title, copy, label, href) {
     </section>`;
 }
 
-const programs = [
-  ["half-day", "Half-Day Customized Training", "3,750", "Focused skill gaps, refresher training or selected modules."],
-  ["full-day", "Full-Day Customized Training", "6,000", "Broader service reset or multi-module development."],
-  ["two-day", "Two-Day Signature Program", "10,000", "Deeper technical, behavioral and guest-experience development."],
-  ["full-academy", "Five-Day Prestige Full Academy", "35,000", "Comprehensive service development and professional credential pathway."],
+const programDescriptions = [
+  "Focused skill gaps, refresher training or selected modules.",
+  "Broader service reset or multi-module development.",
+  "Deeper technical, behavioral and guest-experience development.",
+  "Comprehensive service development and professional credential pathway.",
 ];
+const programs = PROGRAMS.map((program, i) => [program.id, program.title, program.private.toLocaleString('en-US'), programDescriptions[i]]);
 
 const modules = [
   [
@@ -456,8 +464,8 @@ function programRows(linked) {
   const labels = ["Half a day", "One day", "Two days", "Five days"];
   return `<div class="program-collection${linked ? " program-rail" : ""}"${linked ? " data-rail" : ""}><div class="program-grid"${linked ? ' data-rail-track tabindex="0" role="region" aria-label="Flagship training programs"' : ""}>${programs.map(([id, name, price, copy], index) => `<article class="program-card" id="${id}">
     <div class="program-image">${img(images[index], `${name}: practical hospitality service training.`, { sizes: "(min-width: 1100px) 23vw, (min-width: 640px) 46vw, 100vw" })}<span class="program-duration">${labels[index]}</span></div>
-    <div class="program-body"><p class="eyebrow">0${index+1} / Private training</p><h3 class="subhead">${name}</h3><p class="program-summary">${copy}</p><p class="price"><small>Starting at</small>$${price}</p><p class="cohort-note">Per cohort · Up to 25 participants</p>
-    ${linked ? button("Explore program", `training-programs.html#${id}`, "btn-ghost-ink") : `<details class="program-details"><summary>Explore this program<span aria-hidden="true">+</span></summary><div><p>${index === 3 ? "Comprehensive service development with the professional credential pathway. The credential is earned through the Full Academy assessment and performance requirements." : "Training can be customized around selected modules and your organization’s approved service procedures. Prestige begins with discovery before recommending a program."}</p>${modalButton("Discuss this program", "discovery", "btn-ink", { preset: { field: "training_interest", value: programValues[index] } })}</div></details>`}
+    <div class="program-body"><p class="eyebrow">0${index+1} / Private training</p><h3 class="subhead">${name}</h3><p class="program-summary">${copy}</p><p class="cohort-note">Private cohorts · Up to 25 participants</p>
+    ${linked ? button("Explore program", `training-programs.html#${id}`, "btn-ghost-ink") : `<details class="program-details"><summary>Explore this program<span aria-hidden="true">+</span></summary><div><p>${index === 3 ? "Comprehensive service development with the professional credential pathway. The credential is earned through the Full Academy assessment and performance requirements." : "Training can be customized around selected modules and your organization’s approved service procedures."}</p><p class="investment-note">Private training investment begins at $${price} per cohort.</p>${button("View training dates", `private-training.html?program=${id}#booking`, "btn-ink")}${modalButton("Discuss this program", "discovery", "btn-ghost-ink", { preset: { field: "training_interest", value: programValues[index] } })}</div></details>`}
     </div></article>`).join("")}</div>${linked ? `<div class="rail-controls"><span>Explore the programs</span><div><button type="button" data-rail-prev aria-label="Previous program">←</button><button type="button" data-rail-next aria-label="Next program">→</button></div></div>` : ""}</div>`;
 }
 
@@ -481,13 +489,13 @@ function hiddenMeta(source) {
 
 function formNotice() {
   return `<div class="form-notice" data-form-notice hidden tabindex="-1" role="status">
-          <p><strong>Online submission is being connected.</strong> This form did not send your inquiry.</p>
+          <p data-form-result></p>
           <p class="mt-3">Call <a href="tel:+15015595118">501-559-5118</a> or email <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a>.</p>
         </div>`;
 }
 
 function formMarkup(name, prefix) {
-  const fields = name === "discovery" ? `    <form action="#" method="post" novalidate data-phase1-form>
+  const fields = `    <form action="#" method="post" novalidate data-inquiry-form>
       ${hiddenMeta("contact")}
       <div class="form-grid two">
         <div class="field">
@@ -571,75 +579,22 @@ function formMarkup(name, prefix) {
         </div>
       </div>
       <div class="actions">
-        <button class="btn btn-ink" type="submit">Schedule a Discovery Consultation${arrow}</button>
-      </div>
-      ${formNotice()}
-    </form>` : `    <form action="#" method="post" novalidate data-phase1-form>
-      ${hiddenMeta("enrollment")}
-      <div class="form-grid two">
-        <div class="field">
-          <label for="oe-name">Name <span aria-hidden="true">*</span></label>
-          <input id="oe-name" name="name" type="text" required autocomplete="name" aria-describedby="oe-name-error">
-          <p class="field-error" id="oe-name-error" data-error-for="oe-name"></p>
-        </div>
-        <div class="field">
-          <label for="oe-email">Email <span aria-hidden="true">*</span></label>
-          <input id="oe-email" name="email" type="email" required autocomplete="email" aria-describedby="oe-email-error">
-          <p class="field-error" id="oe-email-error" data-error-for="oe-email"></p>
-        </div>
-        <div class="field">
-          <label for="oe-phone">Phone <span aria-hidden="true">*</span></label>
-          <input id="oe-phone" name="phone" type="tel" required autocomplete="tel" aria-describedby="oe-phone-error">
-          <p class="field-error" id="oe-phone-error" data-error-for="oe-phone"></p>
-        </div>
-        <div class="field">
-          <label for="oe-city">City / State <span aria-hidden="true">*</span></label>
-          <input id="oe-city" name="city_state" type="text" required autocomplete="address-level2" aria-describedby="oe-city-error">
-          <p class="field-error" id="oe-city-error" data-error-for="oe-city"></p>
-        </div>
-        <div class="field span-2">
-          <label for="oe-role">Employer / role</label>
-          <input id="oe-role" name="employer_role" type="text" autocomplete="organization-title" aria-describedby="oe-role-error">
-          <p class="field-error" id="oe-role-error" data-error-for="oe-role"></p>
-        </div>
-        <div class="field">
-          <label for="oe-program">Program interest <span aria-hidden="true">*</span></label>
-          <select id="oe-program" name="program_interest" required aria-describedby="oe-program-error">
-            <option value="">Select a program</option>
-            <option>Half-Day</option>
-            <option>Full-Day</option>
-            <option>Two-Day</option>
-            <option>Full Academy</option>
-            <option>Not Sure</option>
-          </select>
-          <p class="field-error" id="oe-program-error" data-error-for="oe-program"></p>
-        </div>
-        <div class="field">
-          <label for="oe-time">Preferred timeframe <span aria-hidden="true">*</span></label>
-          <input id="oe-time" name="preferred_timeframe" type="text" required aria-describedby="oe-time-error">
-          <p class="field-error" id="oe-time-error" data-error-for="oe-time"></p>
-        </div>
-        <div class="field span-2">
-          <div class="check">
-            <input id="oe-consent" name="consent" type="checkbox" value="yes" required aria-describedby="oe-consent-error">
-            <label for="oe-consent">I agree to be contacted about open enrollment. <span aria-hidden="true">*</span></label>
-          </div>
-          <p class="field-error" id="oe-consent-error" data-error-for="oe-consent"></p>
-        </div>
-      </div>
-      <div class="actions">
-        <button class="btn btn-ink" type="submit">Join the Interest List${arrow}</button>
+        <button class="btn btn-ink" type="submit">Prepare My Inquiry${arrow}</button>
       </div>
       ${formNotice()}
     </form>`;
-  return `<div class="form-intro"><p>Online submission is being connected. This form will not send your details.</p><p>To speak with Prestige, <a href="tel:+15015595118">call 501-559-5118</a> or <a href="mailto:nwimbley@prestigesignaturestandard.com">email the Academy</a>.</p><p class="form-required">Fields marked * are required.</p></div>` + fields
-    .replace('data-phase1-form', `data-phase1-form data-form-kind="${name}"`)
+  return `<div class="form-intro"><p>Tell us about your team. Continue to your email app to review and send your inquiry.</p><p>To speak with Prestige, <a href="tel:+15015595118">call 501-559-5118</a> or <a href="mailto:nwimbley@prestigesignaturestandard.com">email the Academy</a>.</p><p class="form-required">Fields marked * are required.</p></div>` + fields
+    .replace('data-inquiry-form', `data-inquiry-form data-form-kind="${name}"`)
     .replaceAll('type="submit"', 'type="submit" disabled')
+    .replaceAll('type="text"', 'type="text" maxlength="200"')
+    .replaceAll('type="email"', 'type="email" maxlength="254"')
+    .replaceAll('type="tel"', 'type="tel" maxlength="50"')
+    .replace('<textarea ', '<textarea maxlength="1200" ')
     .replace(/(id|for|aria-describedby|data-error-for)="([^"]+)"/g, (_, attr, value) => `${attr}="${value.split(" ").map(id => `${prefix}-${id}`).join(" ")}"`);
 }
 
 function modals() {
-  return [["discovery", "Schedule a Discovery Consultation"], ["enrollment", "Join the Interest List"]].map(([name, title]) => `<dialog class="modal" id="${name}-dialog" data-modal="${name}" aria-labelledby="${name}-dialog-title">
+  return [["discovery", "Schedule a Discovery Consultation"]].map(([name, title]) => `<dialog class="modal" id="${name}-dialog" data-modal="${name}" aria-labelledby="${name}-dialog-title">
     <div class="modal-panel"><div class="modal-toolbar"><p class="eyebrow">The Prestige Academy</p><button class="modal-close" type="button" data-close-modal aria-label="Close ${name} form">Close <span aria-hidden="true">×</span></button></div>
     <h2 id="${name}-dialog-title" class="subhead">${title}</h2>${formMarkup(name, `dialog-${name}`)}</div>
   </dialog>`).join("");
@@ -670,6 +625,8 @@ ${heroBlock({
       </ul>
     </div>`,
 })}
+
+    ${trainingPaths()}
 
     <section class="section difference-section bg-ivory" id="prestige-difference">
       <div class="wrap grid gap-12 min-[900px]:grid-cols-2 min-[900px]:items-center">
@@ -754,7 +711,7 @@ ${heroBlock({
       <div class="wrap reveal">
         <p class="eyebrow">Private cohorts</p>
         <h2 class="section-title">Flagship Programs</h2>
-        <p class="lead mt-6">Prices are per cohort of up to 25.</p>
+        <p class="lead mt-6">Build professional presence, practical skill and a consistent guest experience.</p>
         <div class="mt-8">
         ${programRows(true)}
         </div>
@@ -788,7 +745,7 @@ ${closing(
 const training = layout({
   file: "training-programs.html",
   title: "Hospitality Training Programs | Prestige Signature Standard Academy",
-  description: "Half-day, full-day, two-day and five-day hospitality training for private cohorts of up to 25. Starting prices and the 15-module Prestige curriculum.",
+  description: "Half-day, full-day, two-day and five-day hospitality training for private cohorts of up to 25. Professional development and the 15-module Prestige curriculum.",
   path: "/training-programs.html",
   body: `
 ${heroBlock({
@@ -805,8 +762,8 @@ ${heroBlock({
     <section class="section bg-ivory">
       <div class="wrap grid gap-12 min-[900px]:grid-cols-12">
         <div class="min-[900px]:col-span-5 reveal">
-          <p class="eyebrow">Private program terms</p>
-          <h2 class="section-title">Private cohorts of up to 25.</h2>
+          <p class="eyebrow">Training for your organization</p>
+          <h2 class="section-title">Private cohorts of up to 25.</h2><div class="actions">${button("Explore Private Training", "private-training.html", "btn-ink")}</div>
         </div>
         <ul class="rule-list min-[900px]:col-span-7 reveal">
           <li>Maximum standard private cohort: 25 participants.</li>
@@ -820,8 +777,8 @@ ${heroBlock({
 
     <section class="section bg-cream">
       <div class="wrap reveal">
-        <h2 class="section-title">Programs and starting prices</h2>
-        <p class="mt-6 max-w-3xl">Starting prices, per cohort of up to 25.</p>
+        <h2 class="section-title">Four ways to elevate your service</h2>
+        <p class="mt-6 max-w-3xl">Practical development, tailored to the needs of your team.</p>
         <div class="mt-8">
         ${programRows(false)}
         </div>
@@ -978,7 +935,7 @@ ${heroBlock({
             <tr><td>First retest within 30 days</td><td>Complimentary</td></tr>
           </tbody>
         </table>
-        <div class="actions">${modalButton("Ask About the Full Academy", "discovery", "btn-ink", { preset: { field: "training_interest", value: "Full Academy" } })}</div>
+        <div class="actions">${button("Full Academy for Myself", "open-enrollment.html?program=full-academy#booking", "btn-ink")}${button("Full Academy for My Team", "private-training.html?program=full-academy#booking", "btn-ghost-ink")}</div>
       </div>
     </section>
 `,
@@ -1149,69 +1106,31 @@ ${heroBlock({
 `,
 });
 
-const enrollment = layout({
-  file: "open-enrollment.html",
-  title: "Open Enrollment | Prestige Signature Standard Academy",
-  description: "Open enrollment interest list for Prestige hospitality training. No session dates are published until a class is officially scheduled. Per-person prices from $300.",
-  path: "/open-enrollment.html",
-  body: `
-${heroBlock({
-  page: true,
-  image: "academy-training",
-  position: "center 20%",
-  alt: "Hospitality professionals practicing glassware, plate and service-tool standards.",
-  kicker: "Open Enrollment",
-  title: "Professional Development. The Prestige Standard.",
-  lead: "Register your interest in professional hospitality training. Session dates are announced once officially scheduled.",
-  actions: modalButton("Join the Interest List", "enrollment", "btn-light"),
-})}
-
-    <section class="section bg-ivory" id="sessions">
-      <div class="wrap grid gap-10 min-[900px]:grid-cols-2">
-        <div class="reveal">
-          <p class="eyebrow">Current state</p>
-          <h2 class="section-title">Dates are announced only after a session is officially scheduled.</h2>
-          <ul class="rule-list mt-8">
-            <li>Standard class minimum: 8 paid participants.</li>
-            <li>Standard class maximum: 25 participants.</li>
-            <li>A date is not promised until the session is confirmed.</li>
-          </ul>
-        </div>
-        <div class="reveal" data-session-list>
-          <h2 class="subhead">Upcoming sessions</h2>
-          <p class="lead mt-5">No sessions are currently scheduled. Contact Prestige to express your interest in a future class.</p>
-          <div class="actions">${modalButton("Join the Interest List", "enrollment", "btn-ghost-ink")}</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section bg-cream" id="pricing">
-      <div class="wrap reveal">
-        <h2 class="section-title">Per-person pricing</h2>
-        <table class="data-table mt-8">
-          <thead>
-            <tr><th scope="col">Program</th><th scope="col">Per person</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Half-Day</td><td>$300</td></tr>
-            <tr><td>Full-Day</td><td>$500</td></tr>
-            <tr><td>Two-Day Signature Program</td><td>$900</td></tr>
-            <tr><td>Five-Day Full Academy</td><td>$3,200</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="section bg-ivory" id="interest">
-      <div class="wrap reveal">
-        <h2 class="subhead">Interest list</h2>
-        <div id="interest-form" class="inline-form">${formMarkup("enrollment", "page-enrollment")}</div>
-      </div>
-    </section>
-`,
+const privateTraining = layout({
+  file: "private-training.html", title: "Private Training Booking | Prestige Signature Standard Academy",
+  description: "Choose customized hospitality training for your organization. Half-day through five-day programs, private cohorts and flexible payment options.", path: "/private-training.html",
+  body: `${heroBlock({ page: true, image: "training-room", alt: "A Prestige training room prepared for practical hospitality service training.", kicker: "Training for your organization", title: "A Shared Standard.<br>A Stronger Team.", lead: "Customized, hands-on training that brings your people, your procedures and the Prestige standard together.", actions: button("Choose Your Program", "#booking", "btn-light") })}
+  <section class="training-intro bg-cream"><div class="wrap"><p>Private cohorts of up to 25</p><p>Your procedures, integrated</p><p>Four formats. One Prestige standard.</p></div></section>
+  ${bookingMarkup('private')}
+  ${closing("Let’s shape the right program for your team.", "For customized requirements, multiple cohorts or guidance choosing a program, start a conversation with Prestige.", "Discuss Your Training", "contact.html#discovery-form")}`,
 });
 
-const policyDate = "September 24, 2026";
+const enrollment = layout({
+  file: "open-enrollment.html", title: "Open Enrollment | Prestige Signature Standard Academy",
+  description: "Choose your individual hospitality training program and pay securely through Stripe. Four programs, from Half-Day to the Five-Day Full Academy.", path: "/open-enrollment.html",
+  body: `${heroBlock({ page: true, image: "academy-training", position: "center 20%", alt: "Hospitality professionals practicing glassware, plate and service-tool standards.", kicker: "Training for yourself", title: "Your Ambition.<br>The Prestige Standard.", lead: "Build the presence, confidence and practical skills to create experiences worth remembering. Choose the professional development that is right for you.", actions: button("Choose Your Program", "#booking", "btn-light") })}
+  <section class="training-intro bg-cream"><div class="wrap"><p>Training from November 2, 2026</p><p>Up to 25 participants per cohort</p><p>Individual registration</p></div></section>
+  ${bookingMarkup('enrollment')}
+  <section class="section bg-cream"><div class="wrap enrollment-explainer"><div><p class="eyebrow">Choose your own path</p><h2 class="section-title">The program you want.<br>The opportunity to grow.</h2></div><div><p>Choose the program that supports your professional goals. Contact Prestige to confirm training dates and availability, then use the corresponding secure Stripe payment link.</p><p>Half-Day programs offer AM and PM sessions. Longer programs cover a complete training block. Each cohort welcomes up to 25 participants; Prestige confirms your session and registration arrangements directly.</p><a class="text-link" href="professional-credential.html">Explore the professional credential pathway →</a></div></div></section>`,
+});
+
+const bookingConfirmation = layout({
+  file: "booking-confirmation.html", title: "Your Booking Status | Prestige Signature Standard Academy",
+  description: "Check the payment and confirmation status of your Prestige training booking.", path: "/booking-confirmation.html",
+  body: `<section class="section bg-ivory"><div class="wrap confirmation-wrap"><p class="eyebrow">Your Prestige experience</p><h1 class="page-title">Your booking status</h1><div class="confirmation-card" data-confirmation role="status"><h2 class="subhead">Check your confirmation</h2><p>A return from checkout alone does not confirm a booking. Use the secure status link provided with your registration, or contact Prestige for assistance.</p></div><div class="actions">${button("Open Enrollment", "open-enrollment.html", "btn-ink")}${button("Contact Prestige", "contact.html", "btn-ghost-ink")}</div></div></section>`,
+});
+
+const policyDate = "September 28, 2026";
 
 function legalPage({ file, title, description, kicker, heading, lead, sections }) {
   const related = [
@@ -1246,17 +1165,17 @@ function legalPage({ file, title, description, kicker, heading, lead, sections }
 const privacy = legalPage({
   file: "privacy.html",
   title: "Privacy | Prestige Signature Standard Academy",
-  description: "How The Prestige Signature Standard Academy website handles inquiries. Forms on this site do not send yet.",
+  description: "Privacy information for inquiries and training registration with The Prestige Signature Standard Academy.",
   kicker: "Privacy",
   heading: "Privacy",
-  lead: "This page describes what this website collects, and what it does not.",
+  lead: "Information about your inquiry, training selection and payment details.",
   sections: [
     ["Who operates this site", `<p>The Prestige Signature Standard Academy operates this website from Bryant, Arkansas. Questions about privacy can go to <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a> or <a href="tel:+15015595118">501-559-5118</a>.</p>`],
-    ["What the forms ask for", `<p>The discovery form asks for name, company, title, email, phone, industry, number of people to train, city and state, training interest, desired timing, and an optional note about the current service challenge. It also asks for permission to be contacted about that inquiry.</p><p>The open-enrollment interest form asks for name, email, phone, city and state, employer or role, program interest, preferred timeframe, and agreement to be contacted about open enrollment.</p><p>Each form includes a hidden field used to filter automated submissions, and may record which page the form was opened from.</p>`],
-    ["Forms on this website do not send yet", `<p>Online submission is still being connected. Completing a form on this website does not send the inquiry and does not store it with the academy. To reach Prestige now, call or email.</p>`],
-    ["If submission is connected later", `<p>Information from a discovery inquiry would be used to reply and to discuss training. Information from the interest list would be used to contact that person about a future class. Prestige does not sell personal information and does not use it for unrelated advertising.</p>`],
-    ["What this site does not do", `<p>This website has no accounts, no online checkout, and no card payment. It does not use advertising or analytics cookies. Fonts are served from this website.</p><p>The service that hosts the site may keep ordinary connection records, such as an IP address, browser type, and the page requested, in order to operate and protect the site.</p>`],
-    ["Children", `<p>This website is for hospitality organizations and professionals. It is not directed to children, and the academy does not knowingly collect information from children.</p>`],
+    ["Inquiries", `<p>The discovery form asks for contact details, your organization and training requirements. It prepares an email draft addressed to <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a>. You review and send that draft from your email app. Preparing the draft does not send an email.</p>`],
+    ["Training registration", `<p>The payment selection identifies your program and, for private training, your deposit or full-payment choice. The payment button opens the corresponding Stripe checkout. Contact Prestige separately to arrange and confirm your training dates.</p>`],
+    ["Payment information", `<p>Stripe handles payment on its own checkout pages. This website does not ask for card details. Direct payment links do not send a training date or session selection to Stripe, and do not automatically reserve a place in the calendar.</p>`],
+    ["Using this website", `<p>This website does not use advertising or analytics cookies. Fonts are served locally. Contact details are not placed in website addresses or saved in browser storage. If you prepare an inquiry, its details are included in the email draft you choose to open.</p><p>The hosting service may keep ordinary connection records to operate and protect the website.</p>`],
+    ["Privacy questions", `<p>Contact Prestige at <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a> for questions about information you provide to the academy.</p>`],
   ],
 });
 
@@ -1266,10 +1185,11 @@ const terms = legalPage({
   description: "Terms for using The Prestige Signature Standard Academy website. A training engagement is confirmed separately.",
   kicker: "Terms",
   heading: "Terms",
-  lead: "These terms cover use of this website. A training engagement is confirmed separately.",
+  lead: "Key information about training selection, booking and the Prestige credential.",
   sections: [
-    ["The website is not a booking", `<p>The pages describe professional hospitality service training. Sending a discovery inquiry or joining the interest list is a request for contact. It does not reserve a date, confirm a cohort, or create a training agreement.</p><p>Open enrollment dates are announced only after a session is officially scheduled. A standard class needs at least 8 paid participants and holds no more than 25.</p>`],
-    ["Prices", `<p>Private training is priced per cohort of up to 25 participants. The starting prices are on the <a href="training-programs.html">Training Programs</a> page. A customized program is discussed after discovery.</p><p>Open enrollment is priced per person. Those prices are on the <a href="open-enrollment.html#pricing">Open Enrollment</a> page. This website does not take payment.</p><p>Credential renewal fees are on the <a href="professional-credential.html#renewal">Professional Credential</a> page.</p>`],
+    ["Private training", `<p>Private programs serve cohorts of up to 25 participants. The program pages show starting investments. Choose the appropriate program, available training dates and either a 50% deposit or payment in full.</p><p>Private training dates are formally reserved only after applicable agreement requirements and the required payment have been satisfied. A discovery inquiry is a request for contact and does not reserve dates.</p>`],
+    ["Open Enrollment", `<p>Open Enrollment training availability begins November 2, 2026. Individuals choose their program and an available date or training block. The first successful registration establishes that program’s cohort for those dates.</p><p>Each cohort has a maximum of 25 participants. Registration closes at capacity, at the registration cutoff or when Prestige closes the session. Opening a payment link alone does not confirm registration.</p>`],
+    ["Program investment", `<p>Approved private training starts at $3,750 for Half-Day, $6,000 for Full-Day, $10,000 for Two-Day and $35,000 for the Five-Day Full Academy. Open Enrollment is $300, $500, $900 and $3,200 per person respectively. All prices are in USD.</p><p>Payment is handled through the corresponding Stripe checkout. Review your program, dates and payment selection before proceeding. Contact Prestige for questions about your training agreement, cancellations, rescheduling or refunds.</p>`],
     ["The credential", `<p>The Prestige Signature Standard Professional Service Credential™ is earned only by meeting the published Five-Day Full Academy requirements, including attendance, knowledge, practical assessment, and the Module 15 capstone. A certificate of completion is not that credential. The credential is valid for two years.</p>`],
     ["Names and materials", `<p>The Prestige Signature Standard™ and the P.O.I.S.E. Method™ name the academy’s standard and teaching sequence. Text, photographs, and training descriptions on this site are for learning about the academy. They are not a license to copy the curriculum or present it as someone else’s program.</p>`],
     ["Using the site", `<p>Use the site to read about the academy and to request contact. Do not attempt to disrupt the site, or submit another person’s information without permission to do so.</p><p>Prestige may update these pages. The date at the top is the current version. Questions can go to <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a>.</p>`],
@@ -1284,8 +1204,8 @@ const accessibility = legalPage({
   heading: "Accessibility",
   lead: "The academy site is built so the training information can be read, reached, and used.",
   sections: [
-    ["How the pages are built", `<p>Pages use headings, labeled form fields, and links that can be followed with a keyboard. The discovery form and the interest form can be opened from any page. Menus can be opened with a keyboard, and Escape closes the desktop menu.</p>`],
-    ["A form on this site does not send", `<p>Online submission is still being connected. If a form cannot be completed, call <a href="tel:+15015595118">501-559-5118</a> or email <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a>. Those are the working ways to reach the academy.</p>`],
+    ["How the pages are built", `<p>Pages use headings, labeled form fields, and links that can be followed with a keyboard. The discovery inquiry is available throughout the site. Separate training pages guide organizations and individual participants. Menus can be opened with a keyboard, and Escape closes the desktop menu.</p>`],
+    ["Help with an inquiry or booking", `<p>If a form or booking selection cannot be completed, call <a href="tel:+15015595118">501-559-5118</a> or email <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a>. Prestige can help you complete an inquiry and discuss your training needs.</p>`],
     ["If something blocks you", `<p>Email the academy, name the page, and describe what got in the way. Prestige will use that to correct the page.</p>`],
   ],
 });
@@ -1320,6 +1240,8 @@ const pages = [
   ["about.html", about],
   ["contact.html", contact],
   ["open-enrollment.html", enrollment],
+  ["private-training.html", privateTraining],
+  ["booking-confirmation.html", bookingConfirmation],
   ["privacy.html", privacy],
   ["terms.html", terms],
   ["accessibility.html", accessibility],

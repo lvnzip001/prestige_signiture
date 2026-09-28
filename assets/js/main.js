@@ -8,11 +8,11 @@
   const main = document.querySelector("main");
   const footer = document.querySelector(".site-footer");
   const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const desktop = window.matchMedia("(min-width: 1320px)");
+  const desktop = window.matchMedia("(min-width: 1440px)");
   const filename = location.pathname.split("/").pop() || "index.html";
   const page = filename.includes(".") ? filename : `${filename}.html`;
   const pageParams = new URLSearchParams(location.search);
-  const focusable = 'a[href], button:not(:disabled), input:not(:disabled):not([type="hidden"]), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]';
+  const focusable = 'a[href], summary, button:not(:disabled), input:not(:disabled):not([type="hidden"]), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]';
   const sectorLinks = [...document.querySelectorAll("[data-sector-link]")];
   const sectorSections = sectorLinks.map(link => document.getElementById(link.hash.slice(1)));
 
@@ -52,7 +52,7 @@
       if (menu.hidden) return;
       if (event.key === "Escape") { event.preventDefault(); setMenu(false, true); }
       if (event.key !== "Tab") return;
-      const nodes = [toggle, ...menu.querySelectorAll(focusable)];
+      const nodes = [toggle, ...menu.querySelectorAll(focusable)].filter(node => node.checkVisibility());
       const first = nodes[0];
       const last = nodes[nodes.length - 1];
       if (event.shiftKey && (document.activeElement === first || !nodes.includes(document.activeElement))) {
@@ -188,7 +188,7 @@
     if (field.validity.customError) return "Please enter a value, rather than spaces.";
     return "Please check this field.";
   }
-  document.querySelectorAll("[data-phase1-form]").forEach(form => {
+  document.querySelectorAll("[data-inquiry-form]").forEach(form => {
     const fields = [...form.querySelectorAll("input, select, textarea")].filter(field => field.type !== "hidden" && !field.classList.contains("hp-input"));
     const source = form.elements.namedItem("source_page");
     if (source) source.value = page;
@@ -213,13 +213,25 @@
       fields.forEach(field => { if (!validate(field) && !firstInvalid) firstInvalid = field; });
       notice.hidden = Boolean(firstInvalid);
       if (firstInvalid) firstInvalid.focus();
-      else notice.focus();
+      else {
+        const result = notice.querySelector('[data-form-result]');
+        result.replaceChildren();
+        if (form.elements.company_website.value) return;
+        const labels = { name: 'Name', company: 'Organization', title: 'Title', email: 'Email', phone: 'Phone', industry: 'Industry', employee_count: 'People to train', city_state: 'City / State', training_interest: 'Training interest', desired_timing: 'Desired timing', service_challenge: 'Service challenge' };
+        const body = Object.entries(labels).map(([key, label]) => `${label}: ${String(form.elements.namedItem(key)?.value || '').trim()}`).join('\n');
+        const link = document.createElement('a');
+        link.className = 'btn btn-ink';
+        link.href = `mailto:nwimbley@prestigesignaturestandard.com?subject=${encodeURIComponent('Private training inquiry')}&body=${encodeURIComponent(body)}`;
+        link.textContent = 'Open Email Draft';
+        result.append('Your inquiry is ready to review. Open the draft below, then send it from your email app. ', document.createElement('br'), link);
+        notice.focus();
+      }
     });
     form.addEventListener("input", event => {
       if (fields.includes(event.target) && event.target.hasAttribute("aria-invalid")) validate(event.target);
       notice.hidden = true;
     });
-    // Enable only after the no-network submit handler is attached.
+    // Phase 1 enhancement: prepare an email draft; delivery is a Phase 2 service.
     form.querySelectorAll('[type="submit"]').forEach(button => { button.disabled = false; });
   });
 

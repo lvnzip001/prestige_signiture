@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const routes = ["index", "training-programs", "prestige-standard", "professional-credential", "who-we-serve", "about", "contact", "open-enrollment", "404"];
+const routes = ["index", "training-programs", "prestige-standard", "professional-credential", "who-we-serve", "about", "contact", "open-enrollment", "private-training", "booking-confirmation", "privacy", "terms", "accessibility", "404"];
 const widths = [360, 390, 768, 1024, 1280, 1440, 1920];
 
 for (const width of widths) {
@@ -50,6 +50,7 @@ test("navigation traps focus, closes with Escape, and releases on resize", async
   await toggle.click();
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
   await expect(page.locator("main")).toHaveAttribute("inert", "");
+  await page.locator('[data-nav-panel] details').last().locator('summary').click();
   const last = page.locator("[data-nav-panel] a").last();
   await last.focus();
   await page.keyboard.press("Tab");
@@ -59,6 +60,8 @@ test("navigation traps focus, closes with Escape, and releases on resize", async
   await page.keyboard.press("Escape");
   await expect(toggle).toBeFocused();
   await expect(page.locator("main")).not.toHaveAttribute("inert", "");
+  await page.setViewportSize({ width: 1366, height: 900 });
+  await expect(toggle).toBeVisible();
   await toggle.click();
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(page.locator("body")).not.toHaveClass(/nav-open/);
@@ -101,10 +104,10 @@ test("program and sector inquiries prefill dialogs with working focus restoratio
   await expect(dialog).not.toBeVisible();
 });
 
-test("both forms validate, preserve details, and never transmit", async ({ page }) => {
+test("inquiry validates and prepares an explicitly unsent email draft", async ({ page }) => {
   const posts = [];
   page.on("request", request => { if (request.method() !== "GET") posts.push(request.url()); });
-  for (const [route, id] of [["contact", "discovery-form"], ["open-enrollment", "interest-form"]]) {
+  for (const [route, id] of [["contact", "discovery-form"]]) {
     await page.goto(`/${route}.html?training_interest=Full+Academy&industry=Restaurant#${id}`);
     const form = page.locator(`#${id} form`);
     await expect(form).toBeVisible();
@@ -118,7 +121,10 @@ test("both forms validate, preserve details, and never transmit", async ({ page 
     await form.locator('[type="checkbox"]').check();
     await form.locator('[type="submit"]').click();
     await expect(form.locator("[data-form-notice]")).toBeVisible();
-    await expect(form.locator("[data-form-notice]")).toContainText("did not send");
+    await expect(form.locator("[data-form-notice]")).toContainText("send it from your email app");
+    const draft = form.getByRole('link', { name: 'Open Email Draft' });
+    expect(await draft.getAttribute('href')).toContain('mailto:nwimbley@prestigesignaturestandard.com?subject=');
+    expect(decodeURIComponent(await draft.getAttribute('href'))).toContain('Name: Test inquiry');
     await expect(form.locator('[name="name"]')).toHaveValue("Test inquiry");
   }
   expect(posts).toEqual([]);
@@ -136,7 +142,7 @@ test("without JavaScript, navigation, content, links and non-submitting forms re
   await page.goto("http://127.0.0.1:4175/prestige-standard.html");
   await expect(page.locator("[data-poise-panel]:visible")).toHaveCount(5);
   await expect(page.locator("[data-nav-panel]")).toBeVisible();
-  await page.locator("[data-nav-panel] [data-open-modal]").click();
+  await page.locator("[data-nav-panel] [data-open-modal]").first().click();
   await expect(page).toHaveURL(/contact.html#discovery-form/);
   await expect(page.locator('#discovery-form [type="submit"]')).toBeDisabled();
   const url = page.url();

@@ -1,6 +1,6 @@
-﻿# The Prestige Signature Standard Academy
+# The Prestige Signature Standard Academy
 
-A nine-page, static Phase 1 website built with semantic HTML, Tailwind CSS, local fonts, and vanilla JavaScript. No backend or form submission service is connected.
+Premium hospitality-training website built with generated semantic HTML, Tailwind CSS, local fonts and vanilla JavaScript. Round 2 preserves the approved visual direction and adds private-training and individual-registration paths.
 
 ## Build and preview
 
@@ -10,52 +10,31 @@ npm run build
 npm run dev
 ```
 
-Preview at `http://localhost:4173`. The build optimizes the supplied images, regenerates all pages, then compiles the production CSS. Generated HTML and CSS are committed so the site can also be served directly by a static host.
+Preview at `http://localhost:4173`. Edit page content in `scripts/render-pages.mjs`, booking markup in `scripts/booking-markup.mjs`, styles in `assets/css/input.css`, shared interactions in `assets/js/main.js`, and booking interactions in `assets/js/booking.mjs`. Do not edit generated HTML or `site.css` directly.
 
-For markup/content changes, edit `scripts/render-pages.mjs`, then run `npm run build:pages` and `npm run build:css`. For styling, edit `assets/css/input.css`; `npm run watch:css` watches it. Interaction code lives in `assets/js/main.js`.
+For content/style changes: `npm run build:pages` then `npm run build:css`. The full build also optimizes photos. The approved artwork in `assets/images/brand-master.jpg` is used unchanged; browser icons use the complete artwork, resized to fit.
 
-The image generator reads `Resources`, preserves originals, and creates WebP variants up to each photo’s source resolution. Page generation reads the image manifest rather than maintaining a second list of dimensions. Do not edit generated HTML or `site.css` directly.
+## Booking and inquiries
 
-## Routes
+- `private-training.html`: organizational program selection and direct Stripe links for 50% deposit or full payment.
+- `open-enrollment.html`: individual program selection and direct Stripe payment links; training dates arranged with Prestige.
+- `booking-confirmation.html`: confirms only server-verified status.
+- `assets/js/programs.mjs`: approved prices and exact twelve Stripe Payment Links.
+- `assets/js/booking-config.mjs`: configurable scheduling rules and service endpoints.
 
-- `/` / `index.html`
-- `training-programs.html`
-- `prestige-standard.html`
-- `professional-credential.html`
-- `who-we-serve.html`
-- `about.html`
-- `contact.html`
-- `open-enrollment.html`
-- `404.html`
+**Supabase, real availability, payment webhooks and email delivery are deferred to Phase 2 by the user.** The user subsequently authorized direct Stripe payment buttons. `paymentMode` is `payment-links`: all twelve supplied links are active, with no fabricated dates or automatic calendar reservation. Inquiry forms prepare an email draft that the visitor reviews and sends. They do not automatically send email.
 
-## Design and behavior
-
-The site uses the approved black, champagne gold, ivory, and cream palette, with locally hosted Cormorant Garamond and Manrope. A photographic homepage hero leads into editorial sections, a keyboard-operated POISE explorer, sector photography, program previews, and the founder story. Mobile program previews support touch scrolling and previous/next buttons.
-
-The header switches to compact navigation below 1440px. Navigation and inquiry dialogs manage focus and scroll locking. Native curriculum and program details work without JavaScript. Reduced-motion preferences disable animation and smooth scrolling.
-
-Discovery links have real `contact.html#discovery-form` destinations; enrollment links lead to `open-enrollment.html#interest-form`. JavaScript enhances these links into quick dialogs. Dedicated pages retain inline forms, even without JavaScript. Public program/industry query parameters are checked against existing select options. Personal information is never put into URLs or local storage.
-
-Forms explain their disconnected status before entry. Submit buttons are disabled in the HTML and enabled only after the local validation handler is attached. Validation displays field errors or an explicit **inquiry not sent** notice. Phone and email links are the immediate contact channels. Future integration is documented in `docs/PHASE_2_SUPABASE.md`.
+See [Phase 2 handoff](docs/PHASE_2_SUPABASE.md) for API contracts, scheduling rules needing confirmation, the Payment Link concurrency limitation, and launch checks. Switch `paymentMode` to `calendar` only after the backend and integrated booking workflow have been tested.
 
 ## Verification
 
 ```sh
-npm test
 npm run test:quick
+npm test
 ```
 
-Browser tests use installed Google Chrome in headless mode and a dedicated local server at `127.0.0.1:4175`. If Chrome is missing, install it first or run `npx playwright install chrome`. No running personal browser session is used. The full suite captures all nine pages at 360, 390, 768, 1024, 1280, 1440, and 1920px, and checks accessibility, interactions, no-JavaScript fallbacks, form safety, asset references, and approved commercial details. Screenshots, failure traces, and the JSON report are written to ignored `test-results/`.
+Playwright uses installed Chrome and a separate local server at port 4175. The full suite checks fourteen pages at seven widths (360–1920px), accessibility, links/assets, forms and navigation. Booking tests intercept all service calls and Stripe navigations; no payments or messages are sent. Passing these tests is not verification of live Stripe prices or database concurrency.
 
-## Deployment boundary and pre-launch items
+## Deployment
 
-Publish only the generated root HTML, `robots.txt`, `sitemap.xml`, and the runtime assets (`assets/css/site.css`, `assets/js/main.js`, `assets/fonts`, `assets/icons`, and `assets/images/optimized`). Do not publish Resources, originals, client documents, HAR files, scripts, tests, node_modules, or project notes. Configure the static host to use `404.html` for missing routes. Deployment is not part of this change.
-
-Before launch:
-
-1. Supply a high-resolution transparent master logo. Current PNG masters have opaque black backgrounds; they have been preserved faithfully.
-2. Supply approved legal copy and any real social profile URLs or PO Box details before adding links.
-3. Connect and verify the Phase 2 inquiry service before enabling real submission. Confirm the destination inbox and transactional email provider then.
-4. Confirm canonical domain/hosting configuration and test on physical iOS and Android devices.
-
-The visual reference images and poster remain source references only. Venue names and sample certificates visible in photographs are not represented as client endorsements or graduate records. Local font license notices are included beside the font files.
+Publish only generated root HTML, robots/sitemap and runtime assets. Keep client documents, Review, Resources, original photographs, HAR files, scripts, tests and project notes private. Deployments are outside this task. Confirm hosting/domain configuration and physical-device behavior before launch.

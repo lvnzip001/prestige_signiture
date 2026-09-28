@@ -3,7 +3,7 @@ import { readFile, access } from "node:fs/promises";
 import path from "node:path";
 
 test("generated pages have valid local links, assets, unique IDs and metadata", async ({ page }) => {
-  const routes = ["index", "training-programs", "prestige-standard", "professional-credential", "who-we-serve", "about", "contact", "open-enrollment", "404"];
+  const routes = ["index", "training-programs", "prestige-standard", "professional-credential", "who-we-serve", "about", "contact", "open-enrollment", "private-training", "booking-confirmation", "privacy", "terms", "accessibility", "404"];
   const documents = {};
   for (const route of routes) documents[`${route}.html`] = await readFile(`${route}.html`, "utf8");
   const report = await page.evaluate(documents => {
@@ -47,7 +47,7 @@ test("generated pages have valid local links, assets, unique IDs and metadata", 
   expect(new Set(report.descriptions).size).toBe(routes.length);
   for (const asset of report.assets) await access(path.resolve(asset));
   const sitemap = await readFile("sitemap.xml", "utf8");
-  for (const route of routes.filter(route => !["index", "404"].includes(route))) expect(sitemap).toContain(`/${route}.html`);
+  for (const route of routes.filter(route => !["index", "404", "booking-confirmation"].includes(route))) expect(sitemap).toContain(`/${route}.html`);
   for (const price of ["3,750", "6,000", "10,000", "35,000"]) expect(documents["training-programs.html"]).toContain(`$${price}`);
   for (const price of ["300", "500", "900", "3,200"]) expect(documents["open-enrollment.html"]).toContain(`$${price}`);
   for (const price of ["650", "800", "950"]) expect(documents["professional-credential.html"]).toContain(`$${price}`);
