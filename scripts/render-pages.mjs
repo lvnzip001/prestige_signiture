@@ -253,7 +253,7 @@ function layout({ file, title, description, path: urlPath, body }) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${title}</title>
   <meta name="description" content="${description}">
-  ${['booking-confirmation.html', '404.html'].includes(file) ? '<meta name="robots" content="noindex, follow">' : ''}
+  ${['booking-confirmation.html', '404.html', 'admin.html'].includes(file) ? '<meta name="robots" content="noindex, follow">' : ''}
   <link rel="canonical" href="${url}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="The Prestige Signature Standard Academy">
@@ -306,6 +306,7 @@ ${body}
   ${modals()}
   <script src="assets/js/main.js" defer></script>
   ${['open-enrollment.html', 'private-training.html', 'booking-confirmation.html'].includes(file) ? '<script type="module" src="assets/js/booking.mjs"></script>' : ''}
+  ${file === 'admin.html' ? '<script type="module" src="assets/js/admin.mjs"></script>' : ''}
 </body>
 </html>
 `;
@@ -1121,7 +1122,7 @@ const enrollment = layout({
   body: `${heroBlock({ page: true, image: "academy-training", position: "center 20%", alt: "Hospitality professionals practicing glassware, plate and service-tool standards.", kicker: "Training for yourself", title: "Your Ambition.<br>The Prestige Standard.", lead: "Build the presence, confidence and practical skills to create experiences worth remembering. Choose the professional development that is right for you.", actions: button("Choose Your Program", "#booking", "btn-light") })}
   <section class="training-intro bg-cream"><div class="wrap"><p>Training from November 2, 2026</p><p>Up to 25 participants per cohort</p><p>Individual registration</p></div></section>
   ${bookingMarkup('enrollment')}
-  <section class="section bg-cream"><div class="wrap enrollment-explainer"><div><p class="eyebrow">Choose your own path</p><h2 class="section-title">The program you want.<br>The opportunity to grow.</h2></div><div><p>Choose the program that supports your professional goals. Contact Prestige to confirm training dates and availability, then use the corresponding secure Stripe payment link.</p><p>Half-Day programs offer AM and PM sessions. Longer programs cover a complete training block. Each cohort welcomes up to 25 participants; Prestige confirms your session and registration arrangements directly.</p><a class="text-link" href="professional-credential.html">Explore the professional credential pathway →</a></div></div></section>`,
+  <section class="section bg-cream"><div class="wrap enrollment-explainer"><div><p class="eyebrow">Choose your own path</p><h2 class="section-title">The program you want.<br>The opportunity to grow.</h2></div><div><p>Choose the program that supports your professional goals. Select an available date, then complete payment on Stripe. Prestige confirms the registration after payment is received.</p><p>Half-Day programs offer AM and PM sessions. Longer programs cover a complete training block. Each cohort welcomes up to 25 participants; Prestige confirms your session and registration arrangements directly.</p><a class="text-link" href="professional-credential.html">Explore the professional credential pathway →</a></div></div></section>`,
 });
 
 const bookingConfirmation = layout({
@@ -1172,8 +1173,8 @@ const privacy = legalPage({
   sections: [
     ["Who operates this site", `<p>The Prestige Signature Standard Academy operates this website from Bryant, Arkansas. Questions about privacy can go to <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a> or <a href="tel:+15015595118">501-559-5118</a>.</p>`],
     ["Inquiries", `<p>The discovery form asks for contact details, your organization and training requirements. It prepares an email draft addressed to <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a>. You review and send that draft from your email app. Preparing the draft does not send an email.</p>`],
-    ["Training registration", `<p>The payment selection identifies your program and, for private training, your deposit or full-payment choice. The payment button opens the corresponding Stripe checkout. Contact Prestige separately to arrange and confirm your training dates.</p>`],
-    ["Payment information", `<p>Stripe handles payment on its own checkout pages. This website does not ask for card details. Direct payment links do not send a training date or session selection to Stripe, and do not automatically reserve a place in the calendar.</p>`],
+    ["Training registration", `<p>Choosing a program and a date saves a pending request with your contact details. The payment button then opens the corresponding Stripe checkout. Prestige confirms the booking after payment is received. Opening Stripe, or returning from Stripe, does not by itself confirm the training date.</p>`],
+    ["Payment information", `<p>Stripe handles payment on its own checkout pages. This website does not ask for card details. A pending request holds the selected session for 16 hours. If it is not confirmed, the date becomes available again.</p>`],
     ["Using this website", `<p>This website does not use advertising or analytics cookies. Fonts are served locally. Contact details are not placed in website addresses or saved in browser storage. If you prepare an inquiry, its details are included in the email draft you choose to open.</p><p>The hosting service may keep ordinary connection records to operate and protect the website.</p>`],
     ["Privacy questions", `<p>Contact Prestige at <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a> for questions about information you provide to the academy.</p>`],
   ],
@@ -1187,8 +1188,8 @@ const terms = legalPage({
   heading: "Terms",
   lead: "Key information about training selection, booking and the Prestige credential.",
   sections: [
-    ["Private training", `<p>Private programs serve cohorts of up to 25 participants. The program pages show starting investments. Choose the appropriate program, available training dates and either a 50% deposit or payment in full.</p><p>Private training dates are formally reserved only after applicable agreement requirements and the required payment have been satisfied. A discovery inquiry is a request for contact and does not reserve dates.</p>`],
-    ["Open Enrollment", `<p>Open Enrollment training availability begins November 2, 2026. Individuals choose their program and an available date or training block. The first successful registration establishes that program’s cohort for those dates.</p><p>Each cohort has a maximum of 25 participants. Registration closes at capacity, at the registration cutoff or when Prestige closes the session. Opening a payment link alone does not confirm registration.</p>`],
+    ["Private training", `<p>Private programs serve cohorts of up to 25 participants. The program pages show starting investments. Choose the appropriate program, available training dates and either a 50% deposit or payment in full.</p><p>A private request stays pending until Prestige confirms that payment was received and reviews the agreement reference. A discovery inquiry is a request for contact and does not reserve dates.</p>`],
+    ["Open Enrollment", `<p>Open Enrollment training availability begins November 2, 2026. Individuals choose their program and an available date or training block. The first confirmed registration establishes that program’s cohort for those dates.</p><p>Each cohort has a maximum of 25 participants. Registration closes at capacity, 48 hours before the session, or when Prestige closes the date. A pending request holds a place for 16 hours. Opening Stripe, or returning from Stripe, does not by itself confirm registration.</p>`],
     ["Program investment", `<p>Approved private training starts at $3,750 for Half-Day, $6,000 for Full-Day, $10,000 for Two-Day and $35,000 for the Five-Day Full Academy. Open Enrollment is $300, $500, $900 and $3,200 per person respectively. All prices are in USD.</p><p>Payment is handled through the corresponding Stripe checkout. Review your program, dates and payment selection before proceeding. Contact Prestige for questions about your training agreement, cancellations, rescheduling or refunds.</p>`],
     ["The credential", `<p>The Prestige Signature Standard Professional Service Credential™ is earned only by meeting the published Five-Day Full Academy requirements, including attendance, knowledge, practical assessment, and the Module 15 capstone. A certificate of completion is not that credential. The credential is valid for two years.</p>`],
     ["Names and materials", `<p>The Prestige Signature Standard™ and the P.O.I.S.E. Method™ name the academy’s standard and teaching sequence. Text, photographs, and training descriptions on this site are for learning about the academy. They are not a license to copy the curriculum or present it as someone else’s program.</p>`],
@@ -1231,6 +1232,157 @@ const missing = layout({
 `,
 });
 
+const admin = layout({
+  file: "admin.html",
+  title: "Booking desk | Prestige Signature Standard Academy",
+  description: "Private booking desk for confirming Prestige training payments.",
+  path: "/admin.html",
+  body: `    <section class="section bg-ivory admin-desk">
+      <div class="wrap">
+        <form class="admin-gate" data-admin-login>
+          <p class="eyebrow">Academy desk</p>
+          <h1 class="page-title">Booking desk</h1>
+          <p class="lead">Sign in to confirm a payment, close a date, or add someone to the desk.</p>
+          <div class="field"><label for="admin-email">Academy email</label><input id="admin-email" name="email" type="email" autocomplete="username" required value="nwimbley@prestigesignaturestandard.com"></div>
+          <div class="field"><label for="admin-password">Password</label><input id="admin-password" name="password" type="password" autocomplete="current-password" required minlength="8"></div>
+          <button class="btn btn-ink" type="submit">Sign in</button>
+          <p class="admin-note" data-admin-login-status role="status" tabindex="-1"></p>
+        </form>
+        <div data-admin-app hidden>
+          <div class="admin-bar">
+            <div>
+              <p class="eyebrow">Academy desk</p>
+              <h1 class="page-title compact">Booking desk</h1>
+            </div>
+            <div class="admin-bar-user">
+              <p data-admin-who></p>
+              <button class="btn btn-ghost-ink" type="button" data-admin-signout>Sign out</button>
+            </div>
+          </div>
+          <div class="admin-reminder" data-admin-reminder hidden>
+            <p>This account is still using a starting password.</p>
+            <button class="btn btn-ink" type="button" data-admin-reminder-go>Change it now</button>
+          </div>
+          <p class="admin-note" data-admin-status role="status" tabindex="-1"></p>
+          <div class="admin-shell">
+            <div class="admin-tabs" role="tablist" aria-label="Desk sections">
+              <button type="button" role="tab" id="tab-bookings" aria-controls="panel-bookings" aria-selected="true" data-admin-tab="bookings">Bookings <span class="admin-count" data-admin-pending hidden></span></button>
+              <button type="button" role="tab" id="tab-dates" aria-controls="panel-dates" aria-selected="false" tabindex="-1" data-admin-tab="dates">Dates</button>
+              <button type="button" role="tab" id="tab-team" aria-controls="panel-team" aria-selected="false" tabindex="-1" data-admin-tab="team">Team</button>
+              <button type="button" role="tab" id="tab-email" aria-controls="panel-email" aria-selected="false" tabindex="-1" data-admin-tab="email">Email</button>
+              <button type="button" role="tab" id="tab-account" aria-controls="panel-account" aria-selected="false" tabindex="-1" data-admin-tab="account">Account</button>
+            </div>
+            <div class="admin-stage">
+              <div role="tabpanel" id="panel-bookings" aria-labelledby="tab-bookings" data-admin-panel="bookings">
+                <div class="admin-panel-head">
+                  <h2 class="subhead">Bookings</h2>
+                  <p data-admin-booking-copy>These requests are not confirmed yet. A pending date is held. An expired hold no longer blocks the date, and you can still confirm the payment if it arrived and the session is still open.</p>
+                </div>
+                <div class="admin-toolbar">
+                  <div class="field admin-search">
+                    <label for="booking-search">Find a booking</label>
+                    <input id="booking-search" name="booking-search" type="search" data-admin-search autocomplete="off" placeholder="Name, email, or reference">
+                  </div>
+                  <div class="admin-filters" role="radiogroup" aria-label="Where a booking stands">
+                    <button type="button" role="radio" aria-checked="true" data-admin-view="waiting">Waiting <span data-admin-count="waiting">0</span></button>
+                    <button type="button" role="radio" aria-checked="false" data-admin-view="confirmed">Confirmed <span data-admin-count="confirmed">0</span></button>
+                    <button type="button" role="radio" aria-checked="false" data-admin-view="released">Released <span data-admin-count="released">0</span></button>
+                    <button type="button" role="radio" aria-checked="false" data-admin-view="all">All <span data-admin-count="all">0</span></button>
+                  </div>
+                </div>
+                <div class="admin-list" data-admin-bookings></div>
+              </div>
+              <div role="tabpanel" id="panel-dates" aria-labelledby="tab-dates" data-admin-panel="dates" hidden>
+                <div class="admin-panel-head">
+                  <h2 class="subhead">Dates</h2>
+                  <p>Weekdays from November 2, 2026 are listed below. A pending or confirmed booking holds that session. An expired hold leaves the date open.</p>
+                </div>
+                <div class="admin-schedule-head">
+                  <button class="btn btn-ghost-ink" type="button" data-admin-month-prev>Previous month</button>
+                  <h3 data-admin-month-label>November 2026</h3>
+                  <button class="btn btn-ghost-ink" type="button" data-admin-month-next>Next month</button>
+                </div>
+                <div class="admin-schedule-wrap">
+                  <table class="admin-schedule">
+                    <caption>Training dates for <span data-admin-month-caption>November 2026</span></caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Morning</th>
+                        <th scope="col">Afternoon</th>
+                        <th scope="col">Full day</th>
+                      </tr>
+                    </thead>
+                    <tbody data-admin-schedule></tbody>
+                  </table>
+                </div>
+                <div class="admin-split">
+                  <section class="admin-panel-box">
+                    <h3>Hold length</h3>
+                    <form class="admin-hold" data-admin-hold>
+                      <div class="field"><label for="hold-hours">Hours a new request keeps the date</label><input id="hold-hours" name="hours" type="number" min="1" max="168" required value="16"></div>
+                      <button class="btn btn-ink" type="submit">Save hold length</button>
+                    </form>
+                    <p class="booking-hint">A booking that is already pending keeps the time it was given.</p>
+                  </section>
+                  <section class="admin-panel-box">
+                    <h3>Close a session</h3>
+                    <form class="admin-close" data-admin-close>
+                      <div class="field"><label for="close-date">Date</label><input id="close-date" name="date" type="date" required></div>
+                      <div class="field"><label for="close-session">Session</label><select id="close-session" name="session"><option value="DAY">Full day</option><option value="AM">Morning</option><option value="PM">Afternoon</option></select></div>
+                      <div class="field"><label for="close-note">Note</label><input id="close-note" name="note" maxlength="160"></div>
+                      <button class="btn btn-ink" type="submit">Close this date</button>
+                    </form>
+                  </section>
+                </div>
+                <h3 class="admin-sub">Closed</h3>
+                <div class="admin-panel-box" data-admin-closures></div>
+              </div>
+              <div role="tabpanel" id="panel-team" aria-labelledby="tab-team" data-admin-panel="team" hidden>
+                <div class="admin-panel-head">
+                  <h2 class="subhead">Team</h2>
+                  <p>Add an academy email. The starting password is shown once, and that person is reminded to replace it.</p>
+                </div>
+                <section class="admin-panel-box">
+                  <h3>New admin</h3>
+                  <form class="admin-hold" data-admin-create>
+                    <div class="field"><label for="new-admin-email">Academy email</label><input id="new-admin-email" name="email" type="email" autocomplete="off" required></div>
+                    <button class="btn btn-ink" type="submit">Create admin</button>
+                  </form>
+                </section>
+                <div class="admin-issued" data-admin-issued hidden></div>
+                <h3 class="admin-sub">Admins</h3>
+                <div class="admin-panel-box" data-admin-team></div>
+              </div>
+              <div role="tabpanel" id="panel-email" aria-labelledby="tab-email" data-admin-panel="email" hidden>
+                <div class="admin-panel-head"><h2 class="subhead">Email</h2><p>Website inquiries are stored securely and sent to this academy inbox.</p></div>
+                <p class="admin-note" data-email-status role="status"></p>
+                <form data-email-settings class="admin-panel-box"><fieldset disabled><legend>Inquiry notifications</legend>
+                  <div class="field"><label for="email-notification">Admin email address</label><input id="email-notification" name="notification_to" type="email" required maxlength="254" aria-describedby="email-help"><p id="email-help">New inquiries are sent here through FormSubmit. When changing this address, activate the new inbox using FormSubmit's confirmation email. Customers receive an on-screen confirmation.</p></div>
+                  <button class="btn btn-ink" type="submit">Save email address</button>
+                </fieldset></form>
+                <section class="admin-panel-box"><h3>Recent notifications</h3><button class="btn btn-ghost-ink" data-email-refresh type="button">Refresh email activity</button><div data-email-log></div></section>
+              </div>
+              <div role="tabpanel" id="panel-account" aria-labelledby="tab-account" data-admin-panel="account" hidden>
+                <div class="admin-panel-head">
+                  <h2 class="subhead">Account</h2>
+                  <p>Replace the password for the email you used to sign in. Use at least 8 characters.</p>
+                </div>
+                <section class="admin-panel-box admin-account">
+                  <h3>New password</h3>
+                  <form class="admin-hold" data-admin-password>
+                    <div class="field"><label for="new-password">New password</label><input id="new-password" name="password" type="password" autocomplete="new-password" required minlength="8"></div>
+                    <button class="btn btn-ink" type="submit">Save password</button>
+                  </form>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>`,
+});
+
 const pages = [
   ["index.html", home],
   ["training-programs.html", training],
@@ -1246,6 +1398,7 @@ const pages = [
   ["terms.html", terms],
   ["accessibility.html", accessibility],
   ["404.html", missing],
+  ["admin.html", admin],
 ];
 
 const root = process.cwd();

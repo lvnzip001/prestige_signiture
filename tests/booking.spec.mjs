@@ -62,38 +62,21 @@ for (const p of PROGRAMS) {
   }
 }
 
-test('direct payment mode uses the approved link without inventing availability', async ({ page }) => {
+test('calendar mode does not offer a Stripe link before a date is chosen', async ({ page }) => {
   await page.goto('/open-enrollment.html#booking');
-  await expect(page.locator('[data-calendar]')).toHaveCount(0);
-  await expect(page.locator('[data-payment-link]')).toHaveAttribute('href', PROGRAMS[0].links.enrollment);
-  await expect(page.locator('.booking-service-message')).toContainText('does not automatically reserve');
-  await page.locator('input[value="full-academy"]').check();
-  await expect(page.locator('[data-payment-price]')).toHaveText('$3,200');
-  await expect(page.locator('[data-payment-link]')).toHaveAttribute('href', PROGRAMS[3].links.enrollment);
+  await expect(page.locator('[data-calendar]')).toBeVisible();
+  await expect(page.locator('[data-payment-link]')).toHaveCount(0);
+  await expect(page.locator('[data-checkout]')).toBeDisabled();
+  await expect(page.locator('[data-js-required]')).toHaveCount(0);
+  await expect(page.locator('.booking-hint').last()).toContainText('stays pending');
 });
 
-test('all twelve direct payment selections navigate to the exact supplied links', async ({ page }) => {
-  await page.route('https://buy.stripe.com/**', route => route.fulfill({ contentType: 'text/html', body: '<h1>Test checkout destination</h1>' }));
-  for (const p of PROGRAMS) {
-    for (const payment of ['enrollment', 'deposit', 'full']) {
-      await page.goto(`/${payment === 'enrollment' ? 'open-enrollment' : 'private-training'}.html?program=${p.id}#booking`);
-      if (payment !== 'enrollment') await page.locator(`input[name="payment"][value="${payment}"]`).check();
-      const amount = payment === 'enrollment' ? p.enrollment : p.private / (payment === 'deposit' ? 2 : 1);
-      await expect(page.locator('[data-payment-price]')).toHaveText(`$${amount.toLocaleString('en-US')}`);
-      await page.locator('[data-payment-link]').click();
-      await expect(page).toHaveURL(p.links[payment]);
-    }
-  }
-});
-
-test('direct payment links remain available without JavaScript', async ({ browser }) => {
+test('without JavaScript the calendar asks for it and keeps the phone line', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
-  await page.goto('http://127.0.0.1:4175/private-training.html#booking');
-  await expect(page.locator('[data-payment-workspace]')).toBeHidden();
-  await expect(page.getByRole('link', { name: 'Pay in full — $35,000' })).toHaveAttribute('href', PROGRAMS[3].links.full);
   await page.goto('http://127.0.0.1:4175/open-enrollment.html#booking');
-  await expect(page.getByRole('link', { name: 'Pay $300 per person', exact: true })).toHaveAttribute('href', PROGRAMS[0].links.enrollment);
+  await expect(page.getByText('Enable JavaScript to view live training dates')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'call 501-559-5118' })).toBeVisible();
   await context.close();
 });
 
@@ -159,9 +142,9 @@ test('approved artwork is preserved byte-for-byte', async () => {
 test('catalogue matches the client-approved amounts and twelve payment links', () => {
   // Independent transcription from Round 2, not values derived from the implementation.
   expect(PROGRAMS.map(p => [p.private / 2, p.private, p.enrollment, p.links.deposit.split('/').pop(), p.links.full.split('/').pop(), p.links.enrollment.split('/').pop()])).toEqual([
-    [1875, 3750, 300, '7sY3CvcUCEYqaPG1tX2VG00', '4gMaEX7Ai2bEbTK0pT2VG01', '5kQ6oH8EmcQi0b2c8B2VG08'],
-    [3000, 6000, 500, 'eVqeVdaMu2bE1f6dcF2VG02', 'cNiaEX2fY5nQ8HygoR2VG03', 'cNi8wP5sa03wf5W60h2VG09'],
-    [5000, 10000, 900, '8x214n4o63fIf5WgoR2VG04', '3cI14ng60g2u0b26Oh2VG05', 'eVq6oHcUC03we1Sc8B2VG0a'],
-    [17500, 35000, 3200, '8x2f7hb0v3fI0b2fkN2VG06', 'dRmaEX9Iq2bEf5WdcF2VG07', '00waEX1bU9E60b27S12VG0b'],
+    [1875, 3750, 300, '7sY3cvcUCeYqaPG1tX2VG00', '4gMaEX7Ai2bEbTK0pT2VG01', '5kQ6oH8EmcQi0b2c8B2VG08'],
+    [3000, 6000, 500, 'eVqeVdaMu2bE1f6dcF2VG02', 'cNiaEX2fY5nQ8HygoR2VG03', 'cNi8wP5sa03wf5W6Oh2VG09'],
+    [5000, 10000, 900, '8x214n4o63fIf5WgoR2VG04', '3cI14ng6Og2u0b26Oh2VG05', 'eVq6oHcUC03we1Sc8B2VG0a'],
+    [17500, 35000, 3200, '8x2fZhbQy3fI0b2fkN2VG06', 'dRmaEX9Iq2bEf5WdcF2VG07', '00waEX1bU9E60b27Sl2VG0b'],
   ]);
 });

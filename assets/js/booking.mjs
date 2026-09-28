@@ -27,10 +27,21 @@ if (directPayment) {
 }
 const formatDate = iso => new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${iso}T12:00:00Z`));
 const validDate = iso => typeof iso === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(iso) && Number.isFinite(Date.parse(iso)) && new Date(iso).toISOString().slice(0, 10) === iso;
-function endpoint(path) {
-  const url = new URL(path, location.origin);
-  if (url.origin !== location.origin) throw new Error('Booking services must use the website origin.');
-  return url;
+const functionsOrigin = 'https://nrehqharpjphuwvijket.supabase.co/functions/v1/';
+let useFunctionsOrigin;
+async function serviceUrl(path) {
+  const local = new URL(path, location.origin);
+  if (local.origin !== location.origin) throw new Error('Booking services must use the website origin.');
+  if (useFunctionsOrigin === undefined && (location.hostname === '127.0.0.1' || location.hostname === 'localhost')) {
+    try {
+      const probe = await fetch(new URL('/api/availability', location.origin), { cache: 'no-store', signal: AbortSignal.timeout(4000) });
+      useFunctionsOrigin = !(probe.headers.get('content-type') || '').includes('application/json');
+    } catch {
+      useFunctionsOrigin = true;
+    }
+  }
+  if (useFunctionsOrigin) return new URL(String(path).replace(/^\/api\//, ''), functionsOrigin);
+  return local;
 }
 async function request(url, options = {}) {
   const response = await fetch(url, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers }, signal: AbortSignal.timeout(15000), cache: 'no-store' });
@@ -40,6 +51,7 @@ async function request(url, options = {}) {
 }
 
 if (root) {
+  root.querySelector('[data-js-required]')?.remove();
   const form = root.querySelector('form');
   const kind = root.dataset.booking;
   const $ = selector => root.querySelector(selector);
@@ -87,14 +99,67 @@ if (root) {
       const full = slots.some(s => s.date === date && s.status === 'full');
       const button = document.createElement('button');
       button.type = 'button';
-      button.textContent = String(day);
       button.disabled = !available.length || submitting;
       button.className = 'calendar-day';
       button.setAttribute('aria-label', `${formatDate(date)}${available.length ? ', available' : full ? ', full / closed' : ', unavailable'}`);
       button.setAttribute('aria-pressed', String(selectedDate === date));
-      if (full) { button.classList.add('calendar-full'); button.title = 'Full / Closed'; }
+      const number = document.createElement('span');
+      number.className = 'calendar-num';
+      number.textContent = String(day);
+      const note = document.createElement('span');
+      note.className = 'calendar-note';
+      note.setAttribute('aria-hidden', 'true');
+      if (available.length && program().halfDay) note.textContent = available.map(slot => slot.session).join(' · ');
+      else if (available.length) note.textContent = kind === 'enrollment' ? `${available[0].remaining} open` : 'Open';
+      else if (full) note.textContent = 'Full';
+      button.append(number, note);
+      if (full && !available.length) { button.classList.add('calendar-full'); button.title = 'Full / Closed'; }
       button.addEventListener('click', () => chooseDay(date));
       calendar.append(button);
+    }
+    renderDateDetail();
+  }
+  function detailLine(slot) {
+    const name = slot.session === 'AM' ? 'Morning' : slot.session === 'PM' ? 'Afternoon' : 'Full day';
+    const range = Array.isArray(slot.dates) && slot.dates.length > 1 ? ` · ${slot.dates.map(formatDate).join(', ')}` : '';
+    const time = slot.timeLabel ? ` · ${slot.timeLabel}` : '';
+    const state = slot.status === 'available' && slot.remaining > 0 ? (kind === 'enrollment' ? `${slot.remaining} of 25 seats open` : 'Open for your team') : slot.status === 'full' ? 'Full' : 'Closed';
+    return `${name}${time}${range} · ${state}`;
+  }
+  function renderDateDetail() {
+    const list = $('[data-date-detail]');
+    list.replaceChildren();
+    const byDate = new Map();
+    for (const slot of slots) {
+      if (!byDate.has(slot.date)) byDate.set(slot.date, []);
+      byDate.get(slot.date).push(slot);
+    }
+    for (const [date, daySlots] of byDate) {
+      const open = daySlots.some(slot => slot.status === 'available' && slot.remaining > 0);
+      const row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'calendar-detail-row';
+      row.disabled = !open || submitting;
+      const when = document.createElement('span');
+      when.className = 'calendar-detail-date';
+      const weekday = document.createElement('strong');
+      weekday.textContent = new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: 'UTC' }).format(new Date(`${date}T12:00:00Z`));
+      const sub = document.createElement('span');
+      sub.textContent = formatDate(date);
+      when.append(weekday, sub);
+      const body = document.createElement('span');
+      body.className = 'calendar-detail-sessions';
+      daySlots.forEach(slot => {
+        const line = document.createElement('span');
+        line.textContent = detailLine(slot);
+        if (!(slot.status === 'available' && slot.remaining > 0)) line.className = 'is-full';
+        body.append(line);
+      });
+      row.append(when, body);
+      row.setAttribute('aria-label', `${weekday.textContent}, ${formatDate(date)}. ${daySlots.map(detailLine).join('. ')}`);
+      row.setAttribute('aria-pressed', String(selectedDate === date));
+      row.addEventListener('click', () => chooseDay(date));
+      list.append(row);
     }
   }
   function chooseDay(date) {
@@ -134,7 +199,7 @@ if (root) {
     }
     message.textContent = 'Checking training availability…';
     try {
-      const url = endpoint(config.availabilityEndpoint);
+      const url = await serviceUrl(config.availabilityEndpoint);
       url.search = new URLSearchParams({ kind, program: program().id, month }).toString();
       const data = await request(url);
       if (token !== generation) return;
@@ -169,11 +234,15 @@ if (root) {
     controls.forEach(control => { control.disabled = true; });
     const notice = $('[data-booking-response]');
     try {
-      const data = await request(endpoint(config.checkoutEndpoint), { method: 'POST', body: JSON.stringify(payload) });
+      const data = await request(await serviceUrl(config.checkoutEndpoint), { method: 'POST', body: JSON.stringify(payload) });
       const url = new URL(data.checkoutUrl);
       const approved = new URL(chosenProgram.links[payment]);
-      if (url.origin !== approved.origin || url.pathname !== approved.pathname || !/^[a-zA-Z0-9_-]{16,200}$/.test(url.searchParams.get('client_reference_id') || '')) throw new Error('Your booking could not be verified. Please contact Prestige before paying.');
-      location.assign(url.href);
+      const reference = url.searchParams.get('client_reference_id') || '';
+      if (url.origin !== approved.origin || url.pathname !== approved.pathname || !/^[a-zA-Z0-9_-]{16,200}$/.test(reference)) throw new Error('Your booking could not be verified. Please contact Prestige before paying.');
+      sessionStorage.setItem('prestige-booking-ref', reference);
+      notice.hidden = false;
+      notice.textContent = `Your request is pending. Reference ${reference}. Prestige will confirm it after payment is received.`;
+      window.setTimeout(() => location.assign(url.href), 900);
     } catch (error) {
       notice.textContent = error.name === 'TimeoutError' ? 'The booking service took too long to respond. Your details are still here. Please try again.' : error.message;
       notice.hidden = false; notice.focus();
@@ -188,13 +257,18 @@ if (root) {
 
 const confirmation = document.querySelector('[data-confirmation]');
 if (confirmation && config.statusEndpoint) {
-  const session = new URLSearchParams(location.search).get('session_id');
-  if (session && /^cs_[A-Za-z0-9_]{16,250}$/.test(session)) {
-    const url = endpoint(config.statusEndpoint); url.searchParams.set('session_id', session);
+  const params = new URLSearchParams(location.search);
+  const ref = params.get('ref') || '';
+  const session = params.get('session_id');
+  serviceUrl(config.statusEndpoint).then(url => {
+  if (/^[a-z0-9]{32}$/.test(ref)) url.searchParams.set('ref', ref);
+  else if (session && /^cs_[A-Za-z0-9_]{16,250}$/.test(session)) url.searchParams.set('session_id', session);
+  if ([...url.searchParams.keys()].length) {
     confirmation.textContent = 'Checking your payment and booking confirmation…';
     request(url).then(data => {
-      const messages = { confirmed: 'Your training is confirmed. Prestige will contact you with your training details.', pending: 'Your payment confirmation is still being processed. Please check again shortly. Do not make another payment.', review: 'Prestige is reviewing your booking. Please contact the Academy before making another payment.', expired: 'This checkout has expired. Please return to the training calendar to choose an available date.' };
+      const messages = { confirmed: 'Your training is confirmed. Prestige will contact you with your training details.', pending: 'Your payment confirmation is still being processed. The request stays pending until Prestige confirms it. Do not make another payment.', review: 'Prestige is reviewing your booking. Please contact the Academy before making another payment.', released: 'This booking was released. The date is available again. Contact Prestige if you still need training.', expired: 'This request has expired. Please return to the training calendar to choose an available date.' };
       confirmation.textContent = messages[data.status] || 'Please contact Prestige to check your booking status.';
     }).catch(() => { confirmation.textContent = 'We couldn’t verify your booking status. Please contact Prestige before making another payment.'; });
   }
+  });
 }

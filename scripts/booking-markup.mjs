@@ -16,6 +16,7 @@ export function bookingMarkup(kind, mode = BOOKING_CONFIG.paymentMode) {
   return `<section class="section bg-ivory booking-section" id="booking" data-booking="${kind}">
     <div class="wrap"><div class="booking-heading"><p class="eyebrow">${privateTraining ? 'Your team. Your training.' : 'Your professional development starts here.'}</p><h2 class="section-title">${privateTraining ? 'Plan your private training' : 'Find your next training experience'}</h2><p>${privateTraining ? 'Choose your program and training dates, then review your payment options.' : 'Choose your program, find an available session and register. Training begins November 2, 2026.'}</p></div>
     <ol class="booking-steps" aria-label="Booking steps"><li><span>01</span> Choose a program</li><li><span>02</span> Find your dates</li><li><span>03</span> ${privateTraining ? 'Review & book' : 'Register & pay'}</li></ol>
+    <p class="form-intro" data-js-required>Enable JavaScript to view live training dates and register. You can also <a href="tel:+15015595118">call 501-559-5118</a> for booking assistance.</p>
     <form data-booking-form>
       <fieldset class="booking-programs" id="pricing"><legend><span class="eyebrow">01 / Program</span> ${privateTraining ? 'What would you like to develop?' : 'Choose your program'}</legend><div class="booking-options">${PROGRAMS.map((p,i) => `<label class="booking-option"><input type="radio" name="program" value="${p.id}" ${i === 0 ? 'checked' : ''}><span class="option-content"><span class="option-duration">${p.halfDay ? 'AM or PM session' : `${p.days} training ${p.days === 1 ? 'day' : 'days'}`}</span><strong>${p.name}</strong><span>${p.benefit}</span>${privateTraining ? '' : `<span class="option-price">${money(p.enrollment)} <small>/ person</small></span>`}</span></label>`).join('')}</div></fieldset>
       <div class="booking-workspace"><div class="booking-main">
@@ -24,7 +25,8 @@ export function bookingMarkup(kind, mode = BOOKING_CONFIG.paymentMode) {
           <div class="calendar-toolbar"><button type="button" class="calendar-arrow" data-month-prev aria-label="Previous month">←</button><h3 data-month-label>November 2026</h3><button type="button" class="calendar-arrow" data-month-next aria-label="Next month">→</button></div>
           <div class="calendar-weekdays" aria-hidden="true"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
           <div class="calendar-grid" data-calendar aria-label="Available training start dates"></div>
-          <p class="calendar-key"><span></span> Available start date <span class="key-selected"></span> Your selection</p>
+          <p class="calendar-key"><span></span> Available start date <span class="key-selected"></span> Your selection <span class="key-full"></span> Full or closed</p>
+          <div class="calendar-detail" data-date-detail aria-label="Training dates this month"></div>
           <p class="booking-service-message" data-availability-message role="status">Checking training availability…</p>
           <div data-session-options class="session-options"></div>
         </fieldset>
@@ -37,12 +39,12 @@ export function bookingMarkup(kind, mode = BOOKING_CONFIG.paymentMode) {
       </div><aside class="booking-summary" aria-labelledby="booking-summary-title"><p class="eyebrow">Your training experience</p><h3 id="booking-summary-title" data-summary-title>Half-Day</h3><dl><div><dt>Format</dt><dd>${privateTraining ? 'Private organizational training' : 'Open Enrollment · 1 participant'}</dd></div><div><dt>Training dates</dt><dd data-summary-date>Select an available date</dd></div><div><dt>Session</dt><dd data-summary-session>Choose AM or PM</dd></div></dl>
         ${privateTraining ? `<fieldset class="payment-choices"><legend>Payment preference</legend><label><input type="radio" name="payment" value="deposit" checked> 50% deposit <strong data-deposit-price></strong></label><label><input type="radio" name="payment" value="full"> Pay in full <strong data-full-price></strong></label></fieldset>` : ''}
         <div class="summary-total"><span>${privateTraining ? 'Due at checkout' : 'Program investment'}</span><strong data-summary-price>${privateTraining ? '$1,875' : '$300'}</strong><small>USD${privateTraining ? ' · starting investment' : ' · per person'}</small></div>
-        <p class="booking-hint">${privateTraining ? 'Your dates are reserved only after your agreement is approved and the required payment succeeds.' : 'Your registration is confirmed after successful payment. Each cohort welcomes up to 25 participants.'}</p>
+        <p class="booking-hint">${privateTraining ? 'Your request stays pending until Prestige confirms that payment was received. The agreement reference is reviewed with that confirmation.' : 'Your registration stays pending until Prestige confirms that payment was received. Each cohort welcomes up to 25 participants.'}</p>
         <button class="btn btn-ink booking-submit" type="submit" disabled data-checkout>${privateTraining ? 'Continue to Stripe' : 'Register & Pay'} <span aria-hidden="true">↗</span></button><p class="checkout-caption">Secure payment through Stripe</p>
         <p class="booking-response" role="status" tabindex="-1" data-booking-response hidden></p>
         <a class="booking-help" href="tel:+15015595118">Need a hand? 501-559-5118</a>
       </aside></div>
-    </form><noscript><p class="form-intro">Enable JavaScript to view live training dates and register. You can also <a href="tel:+15015595118">call 501-559-5118</a> for booking assistance.</p></noscript></div>
+    </form></div>
   </section>`;
 }
 

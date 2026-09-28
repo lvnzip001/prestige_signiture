@@ -189,6 +189,7 @@
     return "Please check this field.";
   }
   document.querySelectorAll("[data-inquiry-form]").forEach(form => {
+    const submission = import('./inquiry.mjs').then(module => module.prepareInquiry(form)).catch(() => null);
     const fields = [...form.querySelectorAll("input, select, textarea")].filter(field => field.type !== "hidden" && !field.classList.contains("hp-input"));
     const source = form.elements.namedItem("source_page");
     if (source) source.value = page;
@@ -207,7 +208,7 @@
       if (error) error.textContent = valid ? "" : errorMessage(field);
       return valid;
     }
-    form.addEventListener("submit", event => {
+    form.addEventListener("submit", async event => {
       event.preventDefault();
       let firstInvalid = null;
       fields.forEach(field => { if (!validate(field) && !firstInvalid) firstInvalid = field; });
@@ -217,13 +218,27 @@
         const result = notice.querySelector('[data-form-result]');
         result.replaceChildren();
         if (form.elements.company_website.value) return;
+        const button = form.querySelector('[type="submit"]');
+        if (button.disabled) return;
+        button.disabled = true;
+        let submissionError = '';
+        try {
+          const send = await submission;
+          if (send) {
+            result.textContent = await send(Object.fromEntries(new FormData(form)));
+            form.reset();
+            notice.focus();
+            return;
+          }
+        } catch (error) { submissionError = `${error.message} Your entries are preserved. `; }
+        finally { button.disabled = false; }
         const labels = { name: 'Name', company: 'Organization', title: 'Title', email: 'Email', phone: 'Phone', industry: 'Industry', employee_count: 'People to train', city_state: 'City / State', training_interest: 'Training interest', desired_timing: 'Desired timing', service_challenge: 'Service challenge' };
         const body = Object.entries(labels).map(([key, label]) => `${label}: ${String(form.elements.namedItem(key)?.value || '').trim()}`).join('\n');
         const link = document.createElement('a');
         link.className = 'btn btn-ink';
         link.href = `mailto:nwimbley@prestigesignaturestandard.com?subject=${encodeURIComponent('Private training inquiry')}&body=${encodeURIComponent(body)}`;
         link.textContent = 'Open Email Draft';
-        result.append('Your inquiry is ready to review. Open the draft below, then send it from your email app. ', document.createElement('br'), link);
+        result.append(submissionError || 'Your inquiry is ready to review. Open the draft below, then send it from your email app. ', document.createElement('br'), link);
         notice.focus();
       }
     });

@@ -1,5 +1,31 @@
 {
   "framework": null,
   "buildCommand": "npm run build:css",
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "rewrites": [
+    {
+      "source": "/api/availability",
+      "destination": "https://nrehqharpjphuwvijket.supabase.co/functions/v1/availability"
+    },
+    {
+      "source": "/api/checkout",
+      "destination": "https://nrehqharpjphuwvijket.supabase.co/functions/v1/checkout"
+    },
+    {
+      "source": "/api/status",
+      "destination": "https://nrehqharpjphuwvijket.supabase.co/functions/v1/status"
+    },
+    {
+      "source": "/api/admin-link",
+      "destination": "https://nrehqharpjphuwvijket.supabase.co/functions/v1/admin-link"
+    },
+    {
+      "source": "/api/admin-team",
+      "destination": "https://nrehqharpjphuwvijket.supabase.co/functions/v1/admin-team"
+    },
+    {
+      "source": "/api/inquiry",
+      "destination": "https://nrehqharpjphuwvijket.supabase.co/functions/v1/inquiry"
+    }
+  ]
 }
