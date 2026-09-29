@@ -1324,6 +1324,59 @@ a {
   color: var(--color-gold);
 }
 
+.form-notice-lead {
+  margin: 0;
+  max-width: 40rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2vw, 1.7rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+.form-notice-facts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem 1.5rem;
+  margin: 1.05rem 0 0;
+  padding-top: 0.95rem;
+  border-top: 1px solid rgba(232, 223, 208, 0.28);
+}
+
+.form-notice-facts div {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.form-notice-facts .is-wide {
+  grid-column: 1 / -1;
+}
+
+.form-notice-facts dt {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+.form-notice-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.form-notice-reach {
+  margin: 1rem 0 0;
+  color: var(--color-cream);
+}
+
+@media (min-width: 40rem) {
+  .form-notice-facts {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 .modal {
   width: min(68rem, calc(100vw - 1.5rem));
   max-height: calc(100dvh - 1.5rem);
@@ -2322,7 +2375,9 @@ button.calendar-detail-row:hover, button.calendar-detail-row[aria-pressed="true"
 }
 /* Academy email editor uses the existing desk spacing and palette. */
 .email-preview { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
-[data-email-log] { overflow-wrap: anywhere; }
-[data-email-log]:not(:empty) { margin-top: .85rem; }
+.inquiry-list { display: grid; gap: .75rem; }
+.inquiry-list:not(:empty) { margin-top: .85rem; }
+.inquiry-list .admin-card { background: var(--color-ivory); }
+.inquiry-list .admin-card p { margin: 0; }
 [data-email-settings] fieldset, [data-email-editor] fieldset { border: 0; padding: 0; min-width: 0; }
 [data-email-settings] .field, [data-email-editor] .field { margin-bottom: 1rem; }

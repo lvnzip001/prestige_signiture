@@ -198,6 +198,44 @@
       if (field && pageParams.has(key)) field.value = pageParams.get(key).slice(0, 120);
     });
     const notice = form.querySelector("[data-form-notice]");
+    function inquiryConfirmation(values) {
+      const text = key => String(values[key] ?? "").trim();
+      const name = text("name");
+      const company = text("company") || "your organization";
+      const interest = text("training_interest");
+      const followUp = !interest || interest === "Not Sure"
+        ? `Prestige will follow up with ${company}.`
+        : `Prestige will follow up about ${interest} training for ${company}.`;
+      const lead = document.createElement("p");
+      lead.className = "form-notice-lead";
+      lead.textContent = name ? `Thank you, ${name}. Your inquiry was sent. ${followUp}` : `Your inquiry was sent. ${followUp}`;
+      const facts = [
+        ["Title", text("title")],
+        ["Email", text("email")],
+        ["Phone", text("phone")],
+        ["Industry", text("industry")],
+        ["People to train", text("employee_count")],
+        ["City / State", text("city_state")],
+        ["Desired timing", text("desired_timing")],
+        ["Service challenge", text("service_challenge"), true],
+      ].filter(([, value]) => value);
+      const nodes = [lead];
+      if (!facts.length) return nodes;
+      const list = document.createElement("dl");
+      list.className = "form-notice-facts";
+      for (const [label, value, wide] of facts) {
+        const row = document.createElement("div");
+        if (wide) row.className = "is-wide";
+        const term = document.createElement("dt");
+        term.textContent = label;
+        const detail = document.createElement("dd");
+        detail.textContent = value;
+        row.append(term, detail);
+        list.append(row);
+      }
+      nodes.push(list);
+      return nodes;
+    }
     function validate(field) {
       field.setCustomValidity("");
       if (field.required && ["text", "textarea", "tel"].includes(field.type) && field.value && !field.value.trim()) field.setCustomValidity("Whitespace only");
@@ -212,7 +250,7 @@
       event.preventDefault();
       let firstInvalid = null;
       fields.forEach(field => { if (!validate(field) && !firstInvalid) firstInvalid = field; });
-      notice.hidden = Boolean(firstInvalid);
+      notice.hidden = true;
       if (firstInvalid) firstInvalid.focus();
       else {
         const result = notice.querySelector('[data-form-result]');
@@ -221,32 +259,36 @@
         const button = form.querySelector('[type="submit"]');
         if (button.disabled) return;
         button.disabled = true;
-        let submissionError = '';
+        const values = Object.fromEntries(new FormData(form));
         try {
           const send = await submission;
           if (send) {
-            result.textContent = await send(Object.fromEntries(new FormData(form)));
-            form.reset();
-            notice.focus();
-            return;
+            result.textContent = await send(values);
+          } else {
+            await import('./inquiry.mjs').then(module => module.sendInquiry(values));
+            result.replaceChildren(...inquiryConfirmation(values));
           }
-        } catch (error) { submissionError = `${error.message} Your entries are preserved. `; }
-        finally { button.disabled = false; }
-        const labels = { name: 'Name', company: 'Organization', title: 'Title', email: 'Email', phone: 'Phone', industry: 'Industry', employee_count: 'People to train', city_state: 'City / State', training_interest: 'Training interest', desired_timing: 'Desired timing', service_challenge: 'Service challenge' };
-        const body = Object.entries(labels).map(([key, label]) => `${label}: ${String(form.elements.namedItem(key)?.value || '').trim()}`).join('\n');
-        const link = document.createElement('a');
-        link.className = 'btn btn-ink';
-        link.href = `mailto:nwimbley@prestigesignaturestandard.com?subject=${encodeURIComponent('Private training inquiry')}&body=${encodeURIComponent(body)}`;
-        link.textContent = 'Email Prestige';
-        result.append(submissionError || 'Your details are ready. Email them to Prestige. ', document.createElement('br'), link);
-        notice.focus();
+          form.reset();
+          notice.hidden = false;
+          notice.focus();
+        } catch (error) {
+          const labels = { name: 'Name', company: 'Organization', title: 'Title', email: 'Email', phone: 'Phone', industry: 'Industry', employee_count: 'People to train', city_state: 'City / State', training_interest: 'Training interest', desired_timing: 'Desired timing', service_challenge: 'Service challenge' };
+          const body = Object.entries(labels).map(([key, label]) => `${label}: ${String(form.elements.namedItem(key)?.value || '').trim()}`).join('\n');
+          const link = document.createElement('a');
+          link.className = 'btn btn-ink';
+          link.href = `mailto:nwimbley@prestigesignaturestandard.com?subject=${encodeURIComponent('Private training inquiry')}&body=${encodeURIComponent(body)}`;
+          link.textContent = 'Email Prestige';
+          result.append(`${error.message} Your entries are preserved. `, document.createElement('br'), link);
+          notice.hidden = false;
+          notice.focus();
+        } finally { button.disabled = false; }
       }
     });
     form.addEventListener("input", event => {
       if (fields.includes(event.target) && event.target.hasAttribute("aria-invalid")) validate(event.target);
       notice.hidden = true;
     });
-    // Phase 1 enhancement: prepare an email draft; delivery is a Phase 2 service.
+    // The stored inquiry service is used when it is configured. Otherwise the form sends through FormSubmit.
     form.querySelectorAll('[type="submit"]').forEach(button => { button.disabled = false; });
   });
 

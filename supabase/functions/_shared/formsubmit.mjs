@@ -11,3 +11,6 @@ export function formSubmitPayload(job) {
 export function formSubmitAccepted(result) {
   return result?.success === true || result?.success === 'true';
 }
+export function formSubmitNeedsActivation(result) {
+  return /needs activation/i.test(String(result?.message || ''));
+}

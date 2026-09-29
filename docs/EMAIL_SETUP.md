@@ -2,7 +2,7 @@
 
 Website inquiries are stored in Supabase and sent only to the admin inbox through FormSubmit. The recipient defaults to `nwimbley@prestigesignaturestandard.com` and can be changed in admin.html → Email. Visitors receive an on-screen acknowledgement after durable storage. No customer email, autoresponse, or booking email is sent. Resend is not used, and no DNS records were changed.
 
-Project: `nrehqharpjphuwvijket`. Delivery is **not enabled**.
+Project: `nrehqharpjphuwvijket`. Delivery is **not enabled**. The current test recipient is `zluvuno@gmail.com`. FormSubmit activation is per address, so this does not activate `nwimbley@prestigesignaturestandard.com`.
 
 ## Deployed
 
@@ -15,9 +15,9 @@ Project: `nrehqharpjphuwvijket`. Delivery is **not enabled**.
 
 ## FormSubmit compatibility
 
-The worker posts JSON to `https://formsubmit.co/ajax/{recipient}` with `Content-Type` and `Accept` set to `application/json`, matching FormSubmit's AJAX example. The payload is `_subject`, `_template: table`, the visitor name, the inquiry text, and the stored reference. It does not send `_captcha`, `_autoresponse`, `_cc`, or any address from the form. Success is accepted when `success` is boolean `true` or the string `"true"`. A non-JSON or unconfirmed response is marked failed and is not retried. Provider acceptance is not proof the inbox received the message. The first real submission to an address sends FormSubmit's activation email; a changed recipient needs that activation again.
+The worker posts JSON to `https://formsubmit.co/ajax/{recipient}` with `Content-Type` and `Accept` set to `application/json`. It also sends `Origin` and `Referer` for `https://prestigesignaturestandard.com`, because FormSubmit rejects a request that has no website referrer. The payload is `_subject` (`Prestige Academy — New discovery inquiry`), `_template: table`, the visitor name, the inquiry text, and the stored reference. It does not send `_captcha`, `_autoresponse`, `_cc`, or any address from the form. Success is accepted when `success` is boolean `true` or the string `"true"`. A response whose message says the form needs activation is recorded as activation required and is not retried. Any other non-JSON or unconfirmed response is marked failed and is not retried. Provider acceptance is not proof the inbox received the message.
 
-The live FormSubmit documentation pages are behind a Cloudflare challenge, so this check used FormSubmit's published AJAX example rather than the rendered HTML. A controlled send is still required before treating the path as working from Supabase's network.
+On 29 September 2026 a setup check was posted to `zluvuno@gmail.com` with the Academy website as the referrer. FormSubmit returned `success: "false"` and the message that the form needs activation. That is the onboarding email, not the inquiry. A request without a website referrer was rejected and did not send onboarding. No inquiry or outbox row was created, and delivery remains off.
 
 ## Still required
 
@@ -28,6 +28,6 @@ The live FormSubmit documentation pages are behind a Cloudflare challenge, so th
 2. Create matching Vault secrets: `prestige_functions_url` = `https://nrehqharpjphuwvijket.supabase.co/functions/v1`, and `prestige_email_worker_secret` = the same value as `EMAIL_WORKER_SECRET`.
 3. Run `supabase/email-schedule.sql` once. It replaces any existing job named `prestige-email-dispatch` before creating the one-minute schedule. Do not run it before both secrets exist; the worker will reject the call.
 4. Create the Turnstile widget and send the public site key. Then set `turnstileSiteKey` and `inquiryEndpoint: '/api/inquiry'` in `assets/js/booking-config.mjs`, rebuild the pages, and publish the site. Until that publish, production still uses the email-draft form.
-5. Agree on one controlled inquiry. Only then run `update public.email_settings set enabled = true where id = true;`, submit that inquiry, and activate FormSubmit from the admin inbox. Submit a second controlled inquiry to confirm receipt. Do not send an unsolicited test.
+5. The FormSubmit activation email for `zluvuno@gmail.com` has been sent. Open that inbox, including spam, and use FormSubmit’s Activate Form link. After that activation, one more controlled inquiry can confirm the subject `Prestige Academy — New discovery inquiry`. Do not send it before the link is used. Changing the recipient later requires a new activation for that new address.
 
 The privacy page still says an inquiry only creates an email draft the visitor chooses to open. Include FormSubmit in the privacy review before the stored-inquiry form is published.

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { formSubmitPayload, formSubmitAccepted } from '../supabase/functions/_shared/formsubmit.mjs';
+import { formSubmitPayload, formSubmitAccepted, formSubmitNeedsActivation } from '../supabase/functions/_shared/formsubmit.mjs';
 test('FormSubmit sends only admin notification fields without autoresponse or recipient overrides', () => {
   const payload = formSubmitPayload({event_key:'inquiry:admin',variables:{name:'Visitor',details:'Message',_cc:'someone@example.com',_autoresponse:'Unwanted'}});
   assert.equal(payload.reference, 'inquiry:admin');
@@ -8,9 +8,12 @@ test('FormSubmit sends only admin notification fields without autoresponse or re
   assert.equal(payload._autoresponse, undefined);
   assert.equal(payload._cc, undefined);
   assert.equal(payload._captcha, undefined);
+  assert.equal(payload._subject, 'Prestige Academy — New discovery inquiry');
   assert.equal(formSubmitAccepted({success:'true'}), true);
   assert.equal(formSubmitAccepted({success:'false'}), false);
   assert.equal(formSubmitAccepted({}), false);
+  assert.equal(formSubmitNeedsActivation({success:'false', message:"This form needs Activation. We've sent you an email containing an 'Activate Form' link."}), true);
+  assert.equal(formSubmitNeedsActivation({success:'false', message:'Server Error'}), false);
 });
 import { renderEmail, validateInquiry } from '../supabase/functions/_shared/email.mjs';
 test('email treats customer content as text and prevents subject line injection', () => {

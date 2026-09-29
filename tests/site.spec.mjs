@@ -104,9 +104,13 @@ test("program and sector inquiries prefill dialogs with working focus restoratio
   await expect(dialog).not.toBeVisible();
 });
 
-test("inquiry validates and prepares an explicitly unsent email draft", async ({ page }) => {
+test("inquiry sends through FormSubmit and confirms what was sent", async ({ page }) => {
   const posts = [];
-  page.on("request", request => { if (request.method() !== "GET") posts.push(request.url()); });
+  await page.route("https://formsubmit.co/**", async route => {
+    posts.push({ url: route.request().url(), body: route.request().postDataJSON() });
+    await route.fulfill({ json: { success: "true", message: "OK" } });
+  });
+  await page.route("https://nrehqharpjphuwvijket.supabase.co/functions/v1/inquiry", route => route.fulfill({ status: 202, json: { accepted: true, message: "Saved." } }));
   for (const [route, id] of [["contact", "discovery-form"]]) {
     await page.goto(`/${route}.html?training_interest=Full+Academy&industry=Restaurant#${id}`);
     const form = page.locator(`#${id} form`);
@@ -120,14 +124,20 @@ test("inquiry validates and prepares an explicitly unsent email draft", async ({
     await form.locator("select[required]").evaluateAll(selects => selects.forEach(select => { select.selectedIndex = 1; }));
     await form.locator('[type="checkbox"]').check();
     await form.locator('[type="submit"]').click();
-    await expect(form.locator("[data-form-notice]")).toBeVisible();
-    await expect(form.locator("[data-form-notice]")).toContainText("Email them to Prestige");
-    const draft = form.getByRole('link', { name: 'Email Prestige' });
-    expect(await draft.getAttribute('href')).toContain('mailto:nwimbley@prestigesignaturestandard.com?subject=');
-    expect(decodeURIComponent(await draft.getAttribute('href'))).toContain('Name: Test inquiry');
-    await expect(form.locator('[name="name"]')).toHaveValue("Test inquiry");
+    const notice = form.locator("[data-form-notice]");
+    await expect(notice).toBeVisible();
+    await expect(notice).toContainText("Thank you, Test inquiry. Your inquiry was sent. Prestige will follow up about Half-Day training for Test inquiry.");
+    await expect(notice.locator("dt")).toHaveText(["Email", "Phone", "Industry", "People to train", "City / State", "Desired timing"]);
+    await expect(notice).not.toContainText("Name: Test inquiry");
+    await expect(notice).toContainText("501-559-5118");
+    await expect(form.locator('[name="name"]')).toHaveValue("");
   }
-  expect(posts).toEqual([]);
+  expect(posts).toHaveLength(1);
+  expect(posts[0].url).toContain("formsubmit.co/ajax/zluvuno%40gmail.com");
+  expect(posts[0].body._subject).toBe("Prestige Academy — New discovery inquiry");
+  expect(posts[0].body._cc).toBeUndefined();
+  expect(posts[0].body._autoresponse).toBeUndefined();
+  expect(posts[0].body.inquiry).toContain("Name: Test inquiry");
 });
 
 test("unknown prefill values are ignored", async ({ page }) => {

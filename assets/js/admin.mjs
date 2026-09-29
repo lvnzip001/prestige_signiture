@@ -7,6 +7,12 @@ const supabase = createClient('https://nrehqharpjphuwvijket.supabase.co', 'sb_pu
 const emailAdmin = initEmailAdmin(supabase);
 const $ = selector => document.querySelector(selector);
 const login = $('[data-admin-login]');
+const rememberedEmailKey = 'prestige-admin-email';
+try {
+  const remembered = localStorage.getItem(rememberedEmailKey);
+  const emailField = login?.querySelector('#admin-email');
+  if (remembered && emailField) emailField.value = remembered;
+} catch { /* This browser is not keeping a saved email. */ }
 const app = $('[data-admin-app]');
 const loginStatus = $('[data-admin-login-status]');
 const status = $('[data-admin-status]');
@@ -606,7 +612,11 @@ login.addEventListener('submit', async event => {
   const password = String(values.get('password') || '');
   note(loginStatus, '');
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) note(loginStatus, 'That email or password was not accepted.');
+  if (error) {
+    note(loginStatus, 'That email or password was not accepted.');
+    return;
+  }
+  try { localStorage.setItem(rememberedEmailKey, email); } catch { /* Sign-in still succeeds if this browser cannot save the email. */ }
 });
 
 $('[data-admin-signout]').addEventListener('click', async () => {

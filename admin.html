@@ -236,7 +236,7 @@
           <p class="eyebrow">Academy desk</p>
           <h1 class="page-title">Booking desk</h1>
           <p class="lead">Sign in to confirm a payment, close a date, or add someone to the desk.</p>
-          <div class="field"><label for="admin-email">Academy email</label><input id="admin-email" name="email" type="email" autocomplete="username" required value="nwimbley@prestigesignaturestandard.com"></div>
+          <div class="field"><label for="admin-email">Academy email</label><input id="admin-email" name="email" type="email" autocomplete="username" required></div>
           <div class="field"><label for="admin-password">Password</label><input id="admin-password" name="password" type="password" autocomplete="current-password" required minlength="8"></div>
           <button class="btn btn-ink" type="submit">Sign in</button>
           <p class="admin-note" data-admin-login-status role="status" tabindex="-1"></p>
@@ -354,7 +354,7 @@
                   <div class="field"><label for="email-notification">Admin email address</label><input id="email-notification" name="notification_to" type="email" required maxlength="254" aria-describedby="email-help"><p id="email-help">New inquiries are sent here through FormSubmit. When changing this address, activate the new inbox using FormSubmit's confirmation email. Customers receive an on-screen confirmation.</p></div>
                   <button class="btn btn-ink" type="submit">Save email address</button>
                 </fieldset></form>
-                <section class="admin-panel-box"><h3>Recent notifications</h3><button class="btn btn-ghost-ink" data-email-refresh type="button">Refresh email activity</button><div data-email-log></div></section>
+                <section class="admin-panel-box"><h3>Inquiries</h3><p class="admin-empty">Each website inquiry is sent to the inbox above and kept here. Delete one when you no longer need it.</p><button class="btn btn-ghost-ink" data-email-refresh type="button">Refresh inquiries</button><div class="inquiry-list" data-email-log></div></section>
               </div>
               <div role="tabpanel" id="panel-account" aria-labelledby="tab-account" data-admin-panel="account" hidden>
                 <div class="admin-panel-head">
@@ -515,8 +515,8 @@
         <button class="btn btn-ink" type="submit" disabled>Send My Inquiry<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 8h11M9 3.5 13.5 8 9 12.5"/></svg></button>
       </div>
       <div class="form-notice" data-form-notice hidden tabindex="-1" role="status">
-          <p data-form-result></p>
-          <p class="mt-3">Call <a href="tel:+15015595118">501-559-5118</a> or email <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a>.</p>
+          <div data-form-result></div>
+          <p class="form-notice-reach">Call <a href="tel:+15015595118">501-559-5118</a> or email <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a>.</p>
         </div>
     </form></div>
   </dialog>

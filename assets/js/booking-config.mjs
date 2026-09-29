@@ -7,6 +7,7 @@ export const BOOKING_CONFIG = Object.freeze({
   statusEndpoint: '/api/status',
   inquiryEndpoint: null,
   turnstileSiteKey: null, // Set with inquiryEndpoint after the email backend is deployed.
+  formSubmitRecipient: 'zluvuno@gmail.com', // Testing inbox. FormSubmit must be activated for this address.
   openingDate: '2026-11-02',
   timeZone: 'America/Chicago',
   trainingWeekdays: [1, 2, 3, 4, 5], // Monday–Friday. The server enforces this.
