@@ -104,13 +104,13 @@ test("program and sector inquiries prefill dialogs with working focus restoratio
   await expect(dialog).not.toBeVisible();
 });
 
-test("inquiry sends through FormSubmit and confirms what was sent", async ({ page }) => {
+test("inquiry is sent for the academy website and confirms what was sent", async ({ page }) => {
   const posts = [];
   await page.route("https://formsubmit.co/**", async route => {
-    posts.push({ url: route.request().url(), body: route.request().postDataJSON() });
-    await route.fulfill({ json: { success: "true", message: "OK" } });
+    posts.push(route.request().url());
+    await route.fulfill({ json: { success: "true" } });
   });
-  await page.route("https://nrehqharpjphuwvijket.supabase.co/functions/v1/inquiry", route => route.fulfill({ status: 202, json: { accepted: true, message: "Saved." } }));
+  await page.route("https://nrehqharpjphuwvijket.supabase.co/functions/v1/inquiry", route => route.fulfill({ status: 202, json: { accepted: true, mailed: true, message: "Saved." } }));
   for (const [route, id] of [["contact", "discovery-form"]]) {
     await page.goto(`/${route}.html?training_interest=Full+Academy&industry=Restaurant#${id}`);
     const form = page.locator(`#${id} form`);
@@ -132,12 +132,7 @@ test("inquiry sends through FormSubmit and confirms what was sent", async ({ pag
     await expect(notice).toContainText("501-559-5118");
     await expect(form.locator('[name="name"]')).toHaveValue("");
   }
-  expect(posts).toHaveLength(1);
-  expect(posts[0].url).toContain("formsubmit.co/ajax/zluvuno%40gmail.com");
-  expect(posts[0].body._subject).toBe("Prestige Academy — New discovery inquiry");
-  expect(posts[0].body._cc).toBeUndefined();
-  expect(posts[0].body._autoresponse).toBeUndefined();
-  expect(posts[0].body.inquiry).toContain("Name: Test inquiry");
+  expect(posts).toHaveLength(0);
 });
 
 test("unknown prefill values are ignored", async ({ page }) => {

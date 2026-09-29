@@ -548,8 +548,8 @@ async function confirmPayment(booking) {
   }
   let sent = false;
   try {
-    const { data } = await supabase.from('email_settings').select('notification_to').single();
-    if (data?.notification_to) sent = await postDeskNotice(data.notification_to, 'confirmed', booking);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) sent = await postDeskNotice(session.access_token, booking.id);
   } catch { sent = false; }
   note(status, sent ? 'Payment confirmed. The notice is in the academy inbox.' : 'Payment confirmed. It is now under Confirmed.');
   await load();

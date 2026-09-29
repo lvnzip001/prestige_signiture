@@ -1,5 +1,4 @@
 import { BOOKING_CONFIG } from './booking-config.mjs';
-import { DESK_NOTICES } from './desk-notice.mjs';
 const labels = { name: 'Name', company: 'Organization', title: 'Title', email: 'Email', phone: 'Phone', industry: 'Industry', employee_count: 'People to train', city_state: 'City / State', training_interest: 'Training interest', desired_timing: 'Desired timing', service_challenge: 'Service challenge' };
 export function inquiryText(values) {
   return Object.entries(labels).map(([key, label]) => `${label}: ${String(values[key] ?? '').trim()}`).filter(line => !line.endsWith(': ')).join('\n');
@@ -34,43 +33,26 @@ export async function prepareInquiry(form) {
 }
 
 export async function sendInquiry(values) {
-  const recipient = BOOKING_CONFIG.formSubmitRecipient;
-  if (!recipient) throw new Error('Inquiry email is not available.');
   const reference = crypto.randomUUID();
   const payload = { ...values, requestId: reference, consent: values.consent || 'yes' };
   delete payload.company_website;
-  const host = location.hostname;
-  const endpoint = BOOKING_CONFIG.inquiryEndpoint || (host === '127.0.0.1' || host === 'localhost' ? 'https://nrehqharpjphuwvijket.supabase.co/functions/v1/inquiry' : '');
-  const store = endpoint ? fetch(endpoint, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', accept: 'application/json' },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(30000),
-  }).then(async response => {
-    const record = await response.json().catch(() => ({}));
-    if (!response.ok || record.accepted !== true) throw new Error(record.message || 'The academy desk could not store this inquiry.');
-    return true;
-  }) : Promise.resolve(false);
-  const mail = fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipient)}`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', accept: 'application/json' },
-    body: JSON.stringify({
-      _subject: DESK_NOTICES.inquiry,
-      _template: 'table',
-      name: String(values.name || '').trim(),
-      inquiry: inquiryText(values),
-      reference,
-    }),
-    signal: AbortSignal.timeout(30000),
-  }).then(async response => {
-    const data = await response.json().catch(() => ({}));
-    if (data.success === true || data.success === 'true') return true;
-    if (/needs activation/i.test(String(data.message || ''))) throw new Error('The inquiry inbox still needs to be activated. Open the activation email from FormSubmit, then send this inquiry again.');
-    throw new Error('Your inquiry could not be sent.');
-  });
-  const [stored, sent] = await Promise.allSettled([store, mail]);
-  const saved = stored.status === 'fulfilled' && stored.value === true;
-  if (sent.status === 'fulfilled') return { sent: true, saved };
-  const reason = sent.reason?.name === 'TimeoutError' ? 'The email notice took too long.' : (sent.reason?.message || 'Your inquiry could not be sent.');
-  throw new Error(saved ? `${reason} Your inquiry is saved on the academy desk.` : reason);
+  const endpoint = BOOKING_CONFIG.inquiryEndpoint || 'https://nrehqharpjphuwvijket.supabase.co/functions/v1/inquiry';
+  let record = {};
+  let response;
+  try {
+    response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(30000),
+    });
+    record = await response.json().catch(() => ({}));
+  } catch (error) {
+    const reason = error?.name === 'TimeoutError' ? 'The email notice took too long.' : 'Your inquiry could not be sent.';
+    throw new Error(reason);
+  }
+  if (!response.ok || record.accepted !== true) throw new Error(record.message || 'Your inquiry could not be sent.');
+  if (record.mailed === true) return { sent: true, saved: true };
+  const reason = record.activation ? 'The inquiry inbox still needs to be activated. Open the activation email from FormSubmit, then send this inquiry again.' : 'Your inquiry could not be sent.';
+  throw new Error(`${reason} Your inquiry is saved on the academy desk.`);
 }

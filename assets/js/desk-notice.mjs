@@ -43,18 +43,17 @@ export function deskNoticePayload(kind, { name, details, reference }) {
   };
 }
 
-export async function postDeskNotice(recipient, kind, booking) {
-  const payload = deskNoticePayload(kind, {
-    name: booking.contact_name,
-    details: bookingNoticeText(booking, kind === 'confirmed'),
-    reference: booking.reference,
-  });
-  const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipient)}`, {
+export async function postDeskNotice(accessToken, bookingId) {
+  const response = await fetch('https://nrehqharpjphuwvijket.supabase.co/functions/v1/desk-notice', {
     method: 'POST',
-    headers: { 'content-type': 'application/json', accept: 'application/json' },
-    body: JSON.stringify(payload),
+    headers: {
+      'content-type': 'application/json',
+      accept: 'application/json',
+      authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ id: bookingId }),
     signal: AbortSignal.timeout(15000),
   });
   const result = await response.json().catch(() => ({}));
-  return result.success === true || result.success === 'true';
+  return response.ok && result.mailed === true;
 }

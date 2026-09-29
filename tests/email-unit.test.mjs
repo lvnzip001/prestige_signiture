@@ -2,8 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { formSubmitPayload, formSubmitAccepted, formSubmitNeedsActivation } from '../supabase/functions/_shared/formsubmit.mjs';
 import { DESK_NOTICES as serverNotices, bookingNoticeText, deskNoticePayload } from '../supabase/functions/_shared/desk-notice.mjs';
+import { deliverFormSubmit, ACADEMY_SITE } from '../supabase/functions/_shared/formsubmit.mjs';
 import { DESK_NOTICES as siteNotices } from '../assets/js/desk-notice.mjs';
-test('FormSubmit sends only admin notification fields without autoresponse or recipient overrides', () => {
+test('FormSubmit sends only admin notification fields without autoresponse or recipient overrides', async () => {
   const payload = formSubmitPayload({event_key:'inquiry:admin',variables:{name:'Visitor',details:'Message',_cc:'someone@example.com',_autoresponse:'Unwanted'}});
   assert.equal(payload.reference, 'inquiry:admin');
   assert.equal(payload.inquiry, 'Message');
@@ -27,6 +28,21 @@ test('FormSubmit sends only admin notification fields without autoresponse or re
   assert.equal(deskNoticePayload('payment', { name: 'Guest', details: 'Deposit', reference: 'abc123' })._subject, serverNotices.payment);
   assert.equal(deskNoticePayload('confirmed', { name: 'Guest', details: bookingNoticeText(booking, true), reference: 'abc123' })._subject, 'Prestige Academy — Payment confirmed');
   assert.deepEqual(serverNotices, siteNotices);
+  const original = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), origin: init.headers.origin, referer: init.headers.referer });
+    return new Response(JSON.stringify({ success: 'true' }), { status: 200 });
+  };
+  try {
+    const sent = await deliverFormSubmit('desk@example.com', { _subject: 'Prestige Academy — New discovery inquiry', name: 'Guest' });
+    assert.equal(sent.ok, true);
+    assert.equal(calls[0].origin, ACADEMY_SITE);
+    assert.equal(calls[0].referer, 'https://prestigesignaturestandard.com/contact.html');
+    assert.equal(calls[0].url.includes('127.0.0.1'), false);
+  } finally {
+    globalThis.fetch = original;
+  }
 });
 import { renderEmail, validateInquiry } from '../supabase/functions/_shared/email.mjs';
 test('email treats customer content as text and prevents subject line injection', () => {

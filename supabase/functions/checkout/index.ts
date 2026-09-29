@@ -1,4 +1,5 @@
 import { bookingNoticeText, deskNoticePayload } from '../_shared/desk-notice.mjs';
+import { deliverFormSubmit } from '../_shared/formsubmit.mjs';
 
 const cors = {
   'access-control-allow-origin': '*',
@@ -78,21 +79,11 @@ async function notifyNewBooking(reference: string) {
     const age = Date.now() - Date.parse(booking?.created_at);
     if (!booking || !Number.isFinite(age) || age > 30000) return;
     const kind = booking.kind === 'enrollment' ? 'enrollment' : 'payment';
-    const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipient)}`, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        accept: 'application/json',
-        origin: 'https://prestigesignaturestandard.com',
-        referer: 'https://prestigesignaturestandard.com/contact.html',
-      },
-      body: JSON.stringify(deskNoticePayload(kind, {
-        name: booking.contact_name,
-        details: bookingNoticeText(booking),
-        reference,
-      })),
-      signal: AbortSignal.timeout(8000),
-    });
-    await response.json().catch(() => ({}));
+    const response = await deliverFormSubmit(recipient, deskNoticePayload(kind, {
+      name: booking.contact_name,
+      details: bookingNoticeText(booking),
+      reference,
+    }));
+    void response;
   } catch { /* The booking stands even when the inbox notice does not. */ }
 }

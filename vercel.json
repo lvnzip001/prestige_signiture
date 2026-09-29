@@ -26,6 +26,10 @@
     {
       "source": "/api/inquiry",
       "destination": "https://nrehqharpjphuwvijket.supabase.co/functions/v1/inquiry"
+    },
+    {
+      "source": "/api/desk-notice",
+      "destination": "https://nrehqharpjphuwvijket.supabase.co/functions/v1/desk-notice"
     }
   ]
 }

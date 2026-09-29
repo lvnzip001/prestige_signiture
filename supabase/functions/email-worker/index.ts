@@ -1,5 +1,5 @@
 import { db, json } from '../_shared/client.ts';
-import { formSubmitPayload, formSubmitAccepted, formSubmitNeedsActivation } from '../_shared/formsubmit.mjs';
+import { deliverFormSubmit, formSubmitPayload } from '../_shared/formsubmit.mjs';
 
 Deno.serve(async request => {
   if (request.method !== 'POST') return json({ message: 'Method not allowed' }, 405);
@@ -28,20 +28,10 @@ Deno.serve(async request => {
         job.payload = formSubmitPayload(job);
         await save({ payload: job.payload });
       }
-      const response = await fetch('https://formsubmit.co/ajax/' + encodeURIComponent(job.recipient), {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          accept: 'application/json',
-          origin: 'https://prestigesignaturestandard.com',
-          referer: 'https://prestigesignaturestandard.com/contact.html',
-        },
-        body: JSON.stringify(job.payload), signal: AbortSignal.timeout(20000),
-      });
-      const result = await response.json().catch(() => ({}));
-      if (response.ok && formSubmitAccepted(result)) {
+      const response = await deliverFormSubmit(job.recipient, job.payload, 20000);
+      if (response.ok) {
         await save({ state: 'sent', delivery_status: 'accepted', last_error: null });
-      } else if (formSubmitNeedsActivation(result)) {
+      } else if (response.activation) {
         await save({ state: 'failed', delivery_status: 'activation_required', last_error: 'FormSubmit sent an activation email. Open that inbox and activate the address before another inquiry is sent.' });
       } else {
         await save({ state: 'failed', last_error: 'FormSubmit did not confirm acceptance. Check inbox activation and provider status before resending.' });
