@@ -1,4 +1,5 @@
 import { BOOKING_CONFIG } from './booking-config.mjs';
+import { DESK_NOTICES } from './desk-notice.mjs';
 const labels = { name: 'Name', company: 'Organization', title: 'Title', email: 'Email', phone: 'Phone', industry: 'Industry', employee_count: 'People to train', city_state: 'City / State', training_interest: 'Training interest', desired_timing: 'Desired timing', service_challenge: 'Service challenge' };
 export function inquiryText(values) {
   return Object.entries(labels).map(([key, label]) => `${label}: ${String(values[key] ?? '').trim()}`).filter(line => !line.endsWith(': ')).join('\n');
@@ -54,7 +55,7 @@ export async function sendInquiry(values) {
     method: 'POST',
     headers: { 'content-type': 'application/json', accept: 'application/json' },
     body: JSON.stringify({
-      _subject: 'Prestige Academy — New discovery inquiry',
+      _subject: DESK_NOTICES.inquiry,
       _template: 'table',
       name: String(values.name || '').trim(),
       inquiry: inquiryText(values),

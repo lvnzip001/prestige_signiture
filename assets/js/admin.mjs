@@ -2,6 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 import { PROGRAMS } from './programs.mjs';
 import { BOOKING_CONFIG } from './booking-config.mjs';
 import { initEmailAdmin } from './admin-email.mjs';
+import { postDeskNotice } from './desk-notice.mjs';
 
 const supabase = createClient('https://nrehqharpjphuwvijket.supabase.co', 'sb_publishable_ppqFcB7cMZhYgfd5bCbZZw_DqKHvi7W');
 const emailAdmin = initEmailAdmin(supabase);
@@ -251,7 +252,7 @@ function bookingCard(booking) {
     confirm.textContent = 'Confirm payment';
     confirm.addEventListener('click', () => {
       if (!window.confirm(`Confirm payment for ${personLabel}? Check Stripe for reference ${booking.reference} first. The date stays booked.`)) return;
-      act('confirm_booking', booking.id, 'Payment confirmed. It is now under Confirmed.');
+      confirmPayment(booking);
     });
     actions.append(confirm);
   }
@@ -537,6 +538,21 @@ async function load() {
   });
   await loadTeam();
   await emailAdmin.load();
+}
+
+async function confirmPayment(booking) {
+  const { error } = await supabase.rpc('confirm_booking', { p_id: booking.id });
+  if (error) {
+    note(status, error.message);
+    return;
+  }
+  let sent = false;
+  try {
+    const { data } = await supabase.from('email_settings').select('notification_to').single();
+    if (data?.notification_to) sent = await postDeskNotice(data.notification_to, 'confirmed', booking);
+  } catch { sent = false; }
+  note(status, sent ? 'Payment confirmed. The notice is in the academy inbox.' : 'Payment confirmed. It is now under Confirmed.');
+  await load();
 }
 
 async function act(fn, id, success = 'Saved.') {

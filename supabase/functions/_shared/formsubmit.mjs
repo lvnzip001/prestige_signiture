@@ -1,7 +1,9 @@
+import { DESK_NOTICES } from './desk-notice.mjs';
+
 // Construct a fixed payload, never forwarding client-controlled FormSubmit options.
 export function formSubmitPayload(job) {
   return {
-    _subject: 'Prestige Academy — New discovery inquiry',
+    _subject: DESK_NOTICES.inquiry,
     _template: 'table',
     name: job.variables.name,
     inquiry: job.variables.details,
