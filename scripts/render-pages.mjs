@@ -580,11 +580,11 @@ function formMarkup(name, prefix) {
         </div>
       </div>
       <div class="actions">
-        <button class="btn btn-ink" type="submit">Prepare My Inquiry${arrow}</button>
+        <button class="btn btn-ink" type="submit">Send My Inquiry${arrow}</button>
       </div>
       ${formNotice()}
     </form>`;
-  return `<div class="form-intro"><p>Tell us about your team. Continue to your email app to review and send your inquiry.</p><p>To speak with Prestige, <a href="tel:+15015595118">call 501-559-5118</a> or <a href="mailto:nwimbley@prestigesignaturestandard.com">email the Academy</a>.</p><p class="form-required">Fields marked * are required.</p></div>` + fields
+  return `<div class="form-intro"><p>Tell us about your team. Prestige will follow up about your training.</p><p>To speak with Prestige, <a href="tel:+15015595118">call 501-559-5118</a> or <a href="mailto:nwimbley@prestigesignaturestandard.com">email the Academy</a>.</p><p class="form-required">Fields marked * are required.</p></div>` + fields
     .replace('data-inquiry-form', `data-inquiry-form data-form-kind="${name}"`)
     .replaceAll('type="submit"', 'type="submit" disabled')
     .replaceAll('type="text"', 'type="text" maxlength="200"')
@@ -1118,20 +1118,24 @@ const privateTraining = layout({
 
 const enrollment = layout({
   file: "open-enrollment.html", title: "Open Enrollment | Prestige Signature Standard Academy",
-  description: "Choose your individual hospitality training program and pay securely through Stripe. Four programs, from Half-Day to the Five-Day Full Academy.", path: "/open-enrollment.html",
+  description: "Choose your individual hospitality training program and register securely. Four programs, from Half-Day to the Five-Day Full Academy.", path: "/open-enrollment.html",
   body: `${heroBlock({ page: true, image: "academy-training", position: "center 20%", alt: "Hospitality professionals practicing glassware, plate and service-tool standards.", kicker: "Training for yourself", title: "Your Ambition.<br>The Prestige Standard.", lead: "Build the presence, confidence and practical skills to create experiences worth remembering. Choose the professional development that is right for you.", actions: button("Choose Your Program", "#booking", "btn-light") })}
   <section class="training-intro bg-cream"><div class="wrap"><p>Training from November 2, 2026</p><p>Up to 25 participants per cohort</p><p>Individual registration</p></div></section>
   ${bookingMarkup('enrollment')}
-  <section class="section bg-cream"><div class="wrap enrollment-explainer"><div><p class="eyebrow">Choose your own path</p><h2 class="section-title">The program you want.<br>The opportunity to grow.</h2></div><div><p>Choose the program that supports your professional goals. Select an available date, then complete payment on Stripe. Prestige confirms the registration after payment is received.</p><p>Half-Day programs offer AM and PM sessions. Longer programs cover a complete training block. Each cohort welcomes up to 25 participants; Prestige confirms your session and registration arrangements directly.</p><a class="text-link" href="professional-credential.html">Explore the professional credential pathway →</a></div></div></section>`,
+  <section class="section bg-cream"><div class="wrap enrollment-explainer"><div><p class="eyebrow">Choose your own path</p><h2 class="section-title">The program you want.<br>The opportunity to grow.</h2></div><div><p>Choose the program that supports your professional goals. Select an available date, then complete payment. Prestige confirms the registration after payment is received.</p><p>Half-Day programs offer AM and PM sessions. Longer programs cover a complete training block. Each cohort welcomes up to 25 participants; Prestige confirms your session and registration arrangements directly.</p><a class="text-link" href="professional-credential.html">Explore the professional credential pathway →</a></div></div></section>`,
 });
 
 const bookingConfirmation = layout({
   file: "booking-confirmation.html", title: "Your Booking Status | Prestige Signature Standard Academy",
   description: "Check the payment and confirmation status of your Prestige training booking.", path: "/booking-confirmation.html",
-  body: `<section class="section bg-ivory"><div class="wrap confirmation-wrap"><p class="eyebrow">Your Prestige experience</p><h1 class="page-title">Your booking status</h1><div class="confirmation-card" data-confirmation role="status"><h2 class="subhead">Check your confirmation</h2><p>A return from checkout alone does not confirm a booking. Use the secure status link provided with your registration, or contact Prestige for assistance.</p></div><div class="actions">${button("Open Enrollment", "open-enrollment.html", "btn-ink")}${button("Contact Prestige", "contact.html", "btn-ghost-ink")}</div></div></section>`,
+  body: `<section class="section bg-ivory"><div class="wrap confirmation-wrap"><p class="eyebrow">Your Prestige experience</p><h1 class="page-title">Your booking status</h1><div class="confirmation-card" data-confirmation role="status"><h2 class="subhead">Check your confirmation</h2><p>Payment does not by itself confirm your training. Prestige confirms your place after payment is received. Contact the Academy if you need help with your registration.</p></div><div class="actions">${button("Open Enrollment", "open-enrollment.html", "btn-ink")}${button("Contact Prestige", "contact.html", "btn-ghost-ink")}</div></div></section>`,
 });
 
-const policyDate = "September 28, 2026";
+const policyDate = "September 29, 2026";
+
+function legalId(headingText) {
+  return headingText.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
 
 function legalPage({ file, title, description, kicker, heading, lead, sections }) {
   const related = [
@@ -1139,6 +1143,7 @@ function legalPage({ file, title, description, kicker, heading, lead, sections }
     ["terms.html", "Terms"],
     ["accessibility.html", "Accessibility"],
   ].filter(([href]) => href !== file);
+  const items = sections.map(([headingText, copy]) => ({ id: legalId(headingText), headingText, copy }));
   return layout({
     file,
     title,
@@ -1150,9 +1155,22 @@ function legalPage({ file, title, description, kicker, heading, lead, sections }
         <p class="eyebrow">${kicker}</p>
         <h1 class="page-title compact">${heading}</h1>
         <p class="lead mt-5">${lead}</p>
-        <p class="legal-date">${policyDate}</p>
+        <p class="legal-date">Updated ${policyDate}</p>
+        <nav class="legal-toc" aria-label="On this page">
+          <p>On this page</p>
+          <ol>
+            ${items.map((item) => `<li><a href="#${item.id}">${item.headingText}</a></li>`).join("")}
+          </ol>
+        </nav>
         <div class="prose legal-prose">
-          ${sections.map(([headingText, copy]) => `<h2>${headingText}</h2>${copy}`).join("\n          ")}
+          ${items.map((item) => `<h2 id="${item.id}">${item.headingText}</h2>${item.copy}`).join("\n          ")}
+        </div>
+        <div class="legal-contact">
+          <p class="eyebrow">Contact the Academy</p>
+          <p>The Prestige Signature Standard Academy</p>
+          <p>Bryant, Arkansas</p>
+          <p><a href="tel:+15015595118">501-559-5118</a></p>
+          <p><a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a></p>
         </div>
         <nav class="legal-related" aria-label="Related policies">
           ${related.map(([href, label]) => `<a href="${href}">${label}</a>`).join("")}
@@ -1169,14 +1187,17 @@ const privacy = legalPage({
   description: "Privacy information for inquiries and training registration with The Prestige Signature Standard Academy.",
   kicker: "Privacy",
   heading: "Privacy",
-  lead: "Information about your inquiry, training selection and payment details.",
+  lead: "How Prestige handles the details you share when you inquire about training or register for a program.",
   sections: [
-    ["Who operates this site", `<p>The Prestige Signature Standard Academy operates this website from Bryant, Arkansas. Questions about privacy can go to <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a> or <a href="tel:+15015595118">501-559-5118</a>.</p>`],
-    ["Inquiries", `<p>The discovery form asks for contact details, your organization and training requirements. It prepares an email draft addressed to <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a>. You review and send that draft from your email app. Preparing the draft does not send an email.</p>`],
-    ["Training registration", `<p>Choosing a program and a date saves a pending request with your contact details. The payment button then opens the corresponding Stripe checkout. Prestige confirms the booking after payment is received. Opening Stripe, or returning from Stripe, does not by itself confirm the training date.</p>`],
-    ["Payment information", `<p>Stripe handles payment on its own checkout pages. This website does not ask for card details. A pending request holds the selected session for 16 hours. If it is not confirmed, the date becomes available again.</p>`],
-    ["Using this website", `<p>This website does not use advertising or analytics cookies. Fonts are served locally. Contact details are not placed in website addresses or saved in browser storage. If you prepare an inquiry, its details are included in the email draft you choose to open.</p><p>The hosting service may keep ordinary connection records to operate and protect the website.</p>`],
-    ["Privacy questions", `<p>Contact Prestige at <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a> for questions about information you provide to the academy.</p>`],
+    ["Who this notice is for", `<p>The Prestige Signature Standard Academy operates this website from Bryant, Arkansas. This notice explains what Prestige does with the details you share when you ask about training or register for a program.</p>`],
+    ["Information you share", `<p>A discovery inquiry asks for your name, company, title, email, phone, industry, the number of people to train, city and state, the program you are considering, your preferred timing, and a short note about your current service challenge. You confirm that Prestige may contact you about that inquiry.</p><p>A training registration asks for your name, email, and phone. Private training also asks for your organization and the reference on your approved training agreement. Open Enrollment may include your employer or role. Prestige records the program, dates, and session you select.</p>`],
+    ["How Prestige uses it", `<p>Prestige uses these details to reply to your inquiry, hold the training date you requested, and confirm your place after payment is received. Prestige contacts you about the inquiry or registration you submitted.</p>`],
+    ["Payment", `<p>Payment is completed on a secure payment page. This website does not ask for card details. A request holds the selected session for 16 hours. If Prestige has not confirmed it by then, the date becomes available again. Starting payment, or returning to this site, does not by itself confirm the training date.</p>`],
+    ["What Prestige does not do", `<p>Prestige does not sell the information you provide. This website does not use advertising or analytics cookies. The details you submit are used to respond to your inquiry or registration.</p>`],
+    ["How long it is kept", `<p>Prestige keeps inquiry and registration details for as long as they are needed to respond, deliver the training, and keep a record of that conversation or booking. You may ask about the information Prestige holds for you.</p>`],
+    ["Your requests", `<p>You may ask Prestige to correct details you provided, or to discuss what the Academy has from your inquiry or registration. You can also call or email instead of using a form.</p>`],
+    ["Children", `<p>Training is offered to working professionals and to organizations. This website is not directed at children, and Prestige does not knowingly collect information from children.</p>`],
+    ["Changes to this notice", `<p>Prestige may update this page. The date above is the current version.</p>`],
   ],
 });
 
@@ -1186,14 +1207,18 @@ const terms = legalPage({
   description: "Terms for using The Prestige Signature Standard Academy website. A training engagement is confirmed separately.",
   kicker: "Terms",
   heading: "Terms",
-  lead: "Key information about training selection, booking and the Prestige credential.",
+  lead: "The terms for reading about the Academy, requesting a conversation, and registering for training.",
   sections: [
-    ["Private training", `<p>Private programs serve cohorts of up to 25 participants. The program pages show starting investments. Choose the appropriate program, available training dates and either a 50% deposit or payment in full.</p><p>A private request stays pending until Prestige confirms that payment was received and reviews the agreement reference. A discovery inquiry is a request for contact and does not reserve dates.</p>`],
-    ["Open Enrollment", `<p>Open Enrollment training availability begins November 2, 2026. Individuals choose their program and an available date or training block. The first confirmed registration establishes that program’s cohort for those dates.</p><p>Each cohort has a maximum of 25 participants. Registration closes at capacity, 48 hours before the session, or when Prestige closes the date. A pending request holds a place for 16 hours. Opening Stripe, or returning from Stripe, does not by itself confirm registration.</p>`],
-    ["Program investment", `<p>Approved private training starts at $3,750 for Half-Day, $6,000 for Full-Day, $10,000 for Two-Day and $35,000 for the Five-Day Full Academy. Open Enrollment is $300, $500, $900 and $3,200 per person respectively. All prices are in USD.</p><p>Payment is handled through the corresponding Stripe checkout. Review your program, dates and payment selection before proceeding. Contact Prestige for questions about your training agreement, cancellations, rescheduling or refunds.</p>`],
+    ["About these terms", `<p>These terms apply when you use this website to learn about The Prestige Signature Standard Academy, request a discovery conversation, or register for training. A confirmed training engagement is the registration Prestige accepts after payment is received.</p>`],
+    ["Inquiries", `<p>A discovery inquiry is a request for Prestige to contact you. It does not reserve a date or confirm a program. Prestige follows up about the training you describe.</p>`],
+    ["Private training", `<p>Private programs serve cohorts of up to 25 participants. Choose the program, the available training dates, and either a 50% deposit or payment in full. A private request stays pending until Prestige confirms that payment was received and reviews the agreement reference.</p>`],
+    ["Open Enrollment", `<p>Open Enrollment training availability begins November 2, 2026. Individuals choose their program and an available date or training block. The first confirmed registration establishes that program’s cohort for those dates.</p><p>Each cohort has a maximum of 25 participants. Registration closes at capacity, 48 hours before the session, or when Prestige closes the date.</p>`],
+    ["Program investment", `<p>Approved private training starts at $3,750 for Half-Day, $6,000 for Full-Day, $10,000 for Two-Day and $35,000 for the Five-Day Full Academy. Open Enrollment is $300, $500, $900 and $3,200 per person respectively. All prices are in USD.</p>`],
+    ["Payment and confirmation", `<p>Review your program, dates, and payment selection before you pay. A request holds a place for 16 hours. Payment does not by itself confirm registration. Prestige confirms your place after payment is received.</p><p>For a question about your training agreement, a cancellation, a new date, or a refund, contact Prestige. The Academy will discuss the request with you.</p>`],
     ["The credential", `<p>The Prestige Signature Standard Professional Service Credential™ is earned only by meeting the published Five-Day Full Academy requirements, including attendance, knowledge, practical assessment, and the Module 15 capstone. A certificate of completion is not that credential. The credential is valid for two years.</p>`],
-    ["Names and materials", `<p>The Prestige Signature Standard™ and the P.O.I.S.E. Method™ name the academy’s standard and teaching sequence. Text, photographs, and training descriptions on this site are for learning about the academy. They are not a license to copy the curriculum or present it as someone else’s program.</p>`],
-    ["Using the site", `<p>Use the site to read about the academy and to request contact. Do not attempt to disrupt the site, or submit another person’s information without permission to do so.</p><p>Prestige may update these pages. The date at the top is the current version. Questions can go to <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a>.</p>`],
+    ["Names and materials", `<p>The Prestige Signature Standard™ and the P.O.I.S.E. Method™ name the Academy’s standard and teaching sequence. Text, photographs, and training descriptions on this site belong to the Academy and are here so you can learn about the programs. They are not a license to copy the curriculum or present it as someone else’s program.</p>`],
+    ["Using the site", `<p>Use the site to read about the Academy and to request contact or registration. Do not disrupt the site, or submit another person’s information without permission to do so.</p>`],
+    ["Changes to these terms", `<p>Prestige may update this page. The date above is the current version.</p>`],
   ],
 });
 
@@ -1203,11 +1228,13 @@ const accessibility = legalPage({
   description: "How to use The Prestige Signature Standard Academy website, and how to report a barrier.",
   kicker: "Accessibility",
   heading: "Accessibility",
-  lead: "The academy site is built so the training information can be read, reached, and used.",
+  lead: "How to read about the Academy, inquire, and register, and how to tell Prestige if something gets in the way.",
   sections: [
-    ["How the pages are built", `<p>Pages use headings, labeled form fields, and links that can be followed with a keyboard. The discovery inquiry is available throughout the site. Separate training pages guide organizations and individual participants. Menus can be opened with a keyboard, and Escape closes the desktop menu.</p>`],
-    ["Help with an inquiry or booking", `<p>If a form or booking selection cannot be completed, call <a href="tel:+15015595118">501-559-5118</a> or email <a href="mailto:nwimbley@prestigesignaturestandard.com">nwimbley@prestigesignaturestandard.com</a>. Prestige can help you complete an inquiry and discuss your training needs.</p>`],
-    ["If something blocks you", `<p>Email the academy, name the page, and describe what got in the way. Prestige will use that to correct the page.</p>`],
+    ["Our commitment", `<p>Prestige wants guests, leaders, and professionals to be able to read about the Academy, ask about training, and register for a program.</p>`],
+    ["How the pages are arranged", `<p>Pages use headings, labeled form fields, and links that can be followed with a keyboard. Photographs include a written description. Training dates are named in words as well as shown on the calendar.</p><p>The discovery inquiry is available throughout the site. Separate pages guide organizations and individual participants.</p>`],
+    ["Another way to inquire or register", `<p>If a form or a date selection cannot be completed, call or email the Academy. Prestige can take your inquiry and discuss your training needs with you.</p>`],
+    ["Training arrangements", `<p>If a participant needs a particular arrangement in order to take part in training, say so when you inquire or register. The Academy will discuss what can be provided.</p>`],
+    ["If something gets in the way", `<p>Email the Academy. Name the page and describe what got in the way. Prestige will review it and correct the page.</p>`],
   ],
 });
 

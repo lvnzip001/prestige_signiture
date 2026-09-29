@@ -15,9 +15,9 @@ export async function prepareInquiry(form) {
   const widget = window.turnstile.render(container, { sitekey: BOOKING_CONFIG.turnstileSiteKey, action: 'inquiry', callback: value => { token = value; }, 'expired-callback': () => { token = ''; }, 'error-callback': () => { token = ''; } });
   form.querySelector('[type="submit"]').textContent = 'Submit My Inquiry';
   const intro = form.previousElementSibling?.querySelector('p');
-  if (intro) intro.textContent = 'Tell us about your team. Submit your inquiry to the Prestige academy desk.';
+  if (intro) intro.textContent = 'Tell us about your team. Prestige will follow up about your training.';
   return async values => {
-    if (!token) throw new Error('Please complete the spam check before submitting.');
+    if (!token) throw new Error('Please complete the check before sending your inquiry.');
     try {
       const response = await fetch(BOOKING_CONFIG.inquiryEndpoint, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...values, requestId, turnstileToken: token }), signal: AbortSignal.timeout(20000) });
       const data = await response.json();

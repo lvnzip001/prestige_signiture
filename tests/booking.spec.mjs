@@ -75,7 +75,7 @@ test('without JavaScript the calendar asks for it and keeps the phone line', asy
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto('http://127.0.0.1:4175/open-enrollment.html#booking');
-  await expect(page.getByText('Enable JavaScript to view live training dates')).toBeVisible();
+  await expect(page.getByText('If the training calendar does not appear')).toBeVisible();
   await expect(page.getByRole('link', { name: 'call 501-559-5118' })).toBeVisible();
   await context.close();
 });
@@ -128,7 +128,7 @@ test('booking is usable and accessible on mobile with live session controls', as
 
 test('a checkout return does not assert success without server confirmation', async ({ page }) => {
   await page.goto('/booking-confirmation.html?success=true');
-  await expect(page.locator('[data-confirmation]')).toContainText('does not confirm a booking');
+  await expect(page.locator('[data-confirmation]')).toContainText('does not by itself confirm');
   await service(page);
   await page.route('**/api/status?**', route => route.fulfill({ json: { status: 'pending' } }));
   await page.goto('/booking-confirmation.html?session_id=cs_test_12345678901234567890');

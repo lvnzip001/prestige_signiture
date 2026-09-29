@@ -247,7 +247,7 @@
   <section class="section bg-ivory booking-section" id="booking" data-booking="private">
     <div class="wrap"><div class="booking-heading"><p class="eyebrow">Your team. Your training.</p><h2 class="section-title">Plan your private training</h2><p>Choose your program and training dates, then review your payment options.</p></div>
     <ol class="booking-steps" aria-label="Booking steps"><li><span>01</span> Choose a program</li><li><span>02</span> Find your dates</li><li><span>03</span> Review & book</li></ol>
-    <p class="form-intro" data-js-required>Enable JavaScript to view live training dates and register. You can also <a href="tel:+15015595118">call 501-559-5118</a> for booking assistance.</p>
+    <p class="form-intro" data-js-required>If the training calendar does not appear, <a href="tel:+15015595118">call 501-559-5118</a> for booking assistance.</p>
     <form data-booking-form>
       <fieldset class="booking-programs" id="pricing"><legend><span class="eyebrow">01 / Program</span> What would you like to develop?</legend><div class="booking-options"><label class="booking-option"><input type="radio" name="program" value="half-day" checked><span class="option-content"><span class="option-duration">AM or PM session</span><strong>Half-Day</strong><span>Focused skills. Immediate confidence.</span></span></label><label class="booking-option"><input type="radio" name="program" value="full-day" ><span class="option-content"><span class="option-duration">1 training day</span><strong>Full-Day</strong><span>A stronger standard across every interaction.</span></span></label><label class="booking-option"><input type="radio" name="program" value="two-day" ><span class="option-content"><span class="option-duration">2 training days</span><strong>Two-Day Signature</strong><span>Refine technique, judgment and guest experience.</span></span></label><label class="booking-option"><input type="radio" name="program" value="full-academy" ><span class="option-content"><span class="option-duration">5 training days</span><strong>Five-Day Full Academy</strong><span>Complete development. A professional credential pathway.</span></span></label></div></fieldset>
       <div class="booking-workspace"><div class="booking-main">
@@ -256,10 +256,10 @@
           <div class="calendar-toolbar"><button type="button" class="calendar-arrow" data-month-prev aria-label="Previous month">←</button><h3 data-month-label>November 2026</h3><button type="button" class="calendar-arrow" data-month-next aria-label="Next month">→</button></div>
           <div class="calendar-weekdays" aria-hidden="true"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
           <div class="calendar-grid" data-calendar aria-label="Available training start dates"></div>
-          <p class="calendar-key"><span></span> Available start date <span class="key-selected"></span> Your selection <span class="key-full"></span> Full or closed</p>
-          <div class="calendar-detail" data-date-detail aria-label="Training dates by week"></div>
+          <p class="calendar-key"><span class="key-item"><span class="key-swatch"></span> Open</span><span class="key-item"><span class="key-swatch key-selected"></span> Selected</span><span class="key-item"><span class="key-swatch key-full"></span> Full</span></p>
           <p class="booking-service-message" data-availability-message role="status">Checking training availability…</p>
           <div data-session-options class="session-options"></div>
+          <div class="calendar-detail" data-date-detail aria-label="Training dates by week"></div>
         </fieldset>
         <fieldset class="booking-details"><legend><span class="eyebrow">03 / Your details</span> Bring your team to Prestige</legend>
           <div class="form-grid two"><div class="field"><label for="booking-name">Full name *</label><input id="booking-name" name="name" required maxlength="160" autocomplete="name"></div><div class="field"><label for="booking-email">Email *</label><input id="booking-email" name="email" type="email" required maxlength="254" autocomplete="email"></div><div class="field"><label for="booking-phone">Phone *</label><input id="booking-phone" name="phone" type="tel" required maxlength="50" autocomplete="tel"></div><div class="field"><label for="booking-company">Organization *</label><input id="booking-company" name="company" required maxlength="200" autocomplete="organization"></div></div>
@@ -269,9 +269,9 @@
         </fieldset>
       </div><aside class="booking-summary" aria-labelledby="booking-summary-title"><p class="eyebrow">Your training experience</p><h3 id="booking-summary-title" data-summary-title>Half-Day</h3><dl><div><dt>Format</dt><dd>Private organizational training</dd></div><div><dt>Training dates</dt><dd data-summary-date>Select an available date</dd></div><div><dt>Session</dt><dd data-summary-session>Choose AM or PM</dd></div></dl>
         <fieldset class="payment-choices"><legend>Payment preference</legend><label><input type="radio" name="payment" value="deposit" checked> 50% deposit <strong data-deposit-price></strong></label><label><input type="radio" name="payment" value="full"> Pay in full <strong data-full-price></strong></label></fieldset>
-        <div class="summary-total"><span>Due at checkout</span><strong data-summary-price>$1,875</strong><small>USD · starting investment</small></div>
+        <div class="summary-total"><span>Due now</span><strong data-summary-price>$1,875</strong><small>USD · starting investment</small></div>
         <p class="booking-hint">Your request stays pending until Prestige confirms that payment was received. The agreement reference is reviewed with that confirmation.</p>
-        <button class="btn btn-ink booking-submit" type="submit" disabled data-checkout>Continue to Stripe <span aria-hidden="true">↗</span></button><p class="checkout-caption">Secure payment through Stripe</p>
+        <button class="btn btn-ink booking-submit" type="submit" disabled data-checkout>Continue to payment <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12 12 4M6.5 4H12v5.5"/></svg></button><p class="checkout-caption">Secure payment</p>
         <p class="booking-response" role="status" tabindex="-1" data-booking-response hidden></p>
         <a class="booking-help" href="tel:+15015595118">Need a hand? 501-559-5118</a>
       </aside></div>
@@ -331,7 +331,7 @@
   </footer>
   <dialog class="modal" id="discovery-dialog" data-modal="discovery" aria-labelledby="discovery-dialog-title">
     <div class="modal-panel"><div class="modal-toolbar"><p class="eyebrow">The Prestige Academy</p><button class="modal-close" type="button" data-close-modal aria-label="Close discovery form">Close <span aria-hidden="true">×</span></button></div>
-    <h2 id="discovery-dialog-title" class="subhead">Schedule a Discovery Consultation</h2><div class="form-intro"><p>Tell us about your team. Continue to your email app to review and send your inquiry.</p><p>To speak with Prestige, <a href="tel:+15015595118">call 501-559-5118</a> or <a href="mailto:nwimbley@prestigesignaturestandard.com">email the Academy</a>.</p><p class="form-required">Fields marked * are required.</p></div>    <form action="#" method="post" novalidate data-inquiry-form data-form-kind="discovery">
+    <h2 id="discovery-dialog-title" class="subhead">Schedule a Discovery Consultation</h2><div class="form-intro"><p>Tell us about your team. Prestige will follow up about your training.</p><p>To speak with Prestige, <a href="tel:+15015595118">call 501-559-5118</a> or <a href="mailto:nwimbley@prestigesignaturestandard.com">email the Academy</a>.</p><p class="form-required">Fields marked * are required.</p></div>    <form action="#" method="post" novalidate data-inquiry-form data-form-kind="discovery">
       <input type="hidden" name="source_page" value="contact">
         <input type="hidden" name="utm_source" value="">
         <input type="hidden" name="utm_medium" value="">
@@ -422,7 +422,7 @@
         </div>
       </div>
       <div class="actions">
-        <button class="btn btn-ink" type="submit" disabled>Prepare My Inquiry<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 8h11M9 3.5 13.5 8 9 12.5"/></svg></button>
+        <button class="btn btn-ink" type="submit" disabled>Send My Inquiry<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 8h11M9 3.5 13.5 8 9 12.5"/></svg></button>
       </div>
       <div class="form-notice" data-form-notice hidden tabindex="-1" role="status">
           <p data-form-result></p>

@@ -237,8 +237,8 @@
         const link = document.createElement('a');
         link.className = 'btn btn-ink';
         link.href = `mailto:nwimbley@prestigesignaturestandard.com?subject=${encodeURIComponent('Private training inquiry')}&body=${encodeURIComponent(body)}`;
-        link.textContent = 'Open Email Draft';
-        result.append(submissionError || 'Your inquiry is ready to review. Open the draft below, then send it from your email app. ', document.createElement('br'), link);
+        link.textContent = 'Email Prestige';
+        result.append(submissionError || 'Your details are ready. Email them to Prestige. ', document.createElement('br'), link);
         notice.focus();
       }
     });

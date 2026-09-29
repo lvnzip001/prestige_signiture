@@ -1,6 +1,21 @@
 import { PROGRAMS, money } from './programs.mjs';
 import { BOOKING_CONFIG as config } from './booking-config.mjs';
 
+const upArrow = () => {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 16 16');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '1.6');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', 'M4 12 12 4M6.5 4H12v5.5');
+  svg.append(path);
+  return svg;
+};
+const labelWithArrow = (element, text) => element.replaceChildren(document.createTextNode(`${text} `), upArrow());
 const root = document.querySelector('[data-booking]');
 const directPayment = document.querySelector('[data-payment-links]');
 if (directPayment) {
@@ -19,7 +34,7 @@ if (directPayment) {
     }
     const link = directPayment.querySelector('[data-payment-link]');
     link.href = p.links[payment];
-    link.textContent = `Pay ${money(amount)}${payment === 'deposit' ? ' Deposit' : ''} on Stripe ↗`;
+    labelWithArrow(link, `Pay ${money(amount)}${payment === 'deposit' ? ' deposit' : ''}`);
   }
   directPayment.addEventListener('change', updatePayment);
   updatePayment();
@@ -31,7 +46,7 @@ const functionsOrigin = 'https://nrehqharpjphuwvijket.supabase.co/functions/v1/'
 let useFunctionsOrigin;
 async function serviceUrl(path) {
   const local = new URL(path, location.origin);
-  if (local.origin !== location.origin) throw new Error('Booking services must use the website origin.');
+  if (local.origin !== location.origin) throw new Error('Please contact Prestige for assistance.');
   if (useFunctionsOrigin === undefined && (location.hostname === '127.0.0.1' || location.hostname === 'localhost')) {
     try {
       const probe = await fetch(new URL('/api/availability', location.origin), { cache: 'no-store', signal: AbortSignal.timeout(4000) });
@@ -77,7 +92,7 @@ if (root) {
     $('[data-summary-title]').textContent = p.name;
     $('[data-summary-date]').textContent = selected ? selected.dates.map(formatDate).join(' · ') : 'Select an available date';
     $('[data-summary-session]').textContent = selected ? selected.session === 'DAY' ? 'Full training day' : `${selected.session}${selected.timeLabel ? ` · ${selected.timeLabel}` : ''}` : p.halfDay ? 'Choose AM or PM' : 'Full training days';
-    $('[data-duration-hint]').textContent = p.halfDay ? 'Choose a day, then an available AM or PM session. Times are shown in the training location’s time zone.' : `We check the complete ${p.days === 1 ? 'day' : `${p.days}-day training block`} before offering a start date. All dates are shown before checkout.`;
+    $('[data-duration-hint]').textContent = p.halfDay ? 'Choose a day, then an available AM or PM session. Times are shown in the training location’s time zone.' : `We check the complete ${p.days === 1 ? 'day' : `${p.days}-day training block`} before offering a start date. Every date in the block is shown before you continue.`;
     const price = kind === 'enrollment' ? p.enrollment : p.private / (form.elements.payment.value === 'deposit' ? 2 : 1);
     $('[data-summary-price]').textContent = money(price);
     if (kind === 'private') {
@@ -85,7 +100,7 @@ if (root) {
       $('[data-full-price]').textContent = money(p.private);
     }
     $('[data-checkout]').disabled = !selected || !config.checkoutEndpoint || submitting;
-    $('[data-checkout]').textContent = submitting ? 'Checking your selection…' : kind === 'private' ? 'Continue to Stripe ↗' : `Register & Pay — ${money(price)} ↗`;
+    labelWithArrow($('[data-checkout]'), submitting ? 'Checking your selection…' : kind === 'private' ? 'Continue to payment' : `Register & Pay — ${money(price)}`);
   }
   function renderCalendar() {
     const [year, m] = month.split('-').map(Number);
@@ -242,6 +257,9 @@ if (root) {
       selected = options[0]; choices.firstChild.setAttribute('aria-pressed', 'true');
     } else if (selected?.date !== date) selected = null;
     summary(); renderCalendar();
+    const message = $('[data-availability-message]');
+    message.textContent = selected ? 'Your session is selected.' : 'Choose a session for this date.';
+    container.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }
   async function loadAvailability() {
     const token = ++generation;
@@ -301,7 +319,7 @@ if (root) {
       notice.textContent = `Your request is pending. Reference ${reference}. Prestige will confirm it after payment is received.`;
       window.setTimeout(() => location.assign(url.href), 900);
     } catch (error) {
-      notice.textContent = error.name === 'TimeoutError' ? 'The booking service took too long to respond. Your details are still here. Please try again.' : error.message;
+      notice.textContent = error.name === 'TimeoutError' ? 'That took too long. Your details are still here. Please try again.' : error.message;
       notice.hidden = false; notice.focus();
       // Revalidate dates after any server rejection; keep entered personal details.
       await loadAvailability();

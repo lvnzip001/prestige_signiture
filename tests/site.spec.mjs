@@ -121,8 +121,8 @@ test("inquiry validates and prepares an explicitly unsent email draft", async ({
     await form.locator('[type="checkbox"]').check();
     await form.locator('[type="submit"]').click();
     await expect(form.locator("[data-form-notice]")).toBeVisible();
-    await expect(form.locator("[data-form-notice]")).toContainText("send it from your email app");
-    const draft = form.getByRole('link', { name: 'Open Email Draft' });
+    await expect(form.locator("[data-form-notice]")).toContainText("Email them to Prestige");
+    const draft = form.getByRole('link', { name: 'Email Prestige' });
     expect(await draft.getAttribute('href')).toContain('mailto:nwimbley@prestigesignaturestandard.com?subject=');
     expect(decodeURIComponent(await draft.getAttribute('href'))).toContain('Name: Test inquiry');
     await expect(form.locator('[name="name"]')).toHaveValue("Test inquiry");
