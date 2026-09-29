@@ -2057,6 +2057,9 @@ summary::-webkit-details-marker { display: none; }
     padding: 0.15rem 1.15rem;
     border-left: 1px solid rgba(176, 141, 87, 0.32);
   }
+  .hero-band .capability-list li:nth-child(3n + 1) {
+    padding-left: 1.15rem;
+  }
   .hero-band .capability-list li:first-child {
     padding-left: 0;
     border-left: 0;
