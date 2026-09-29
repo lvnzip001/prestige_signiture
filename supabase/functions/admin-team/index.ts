@@ -12,9 +12,7 @@ function json(body: unknown, status = 200) {
 }
 
 function startingPassword() {
-  const alphabet = 'abcdefghijkmnpqrstuvwxyz23456789';
-  const bytes = crypto.getRandomValues(new Uint8Array(8));
-  return Array.from(bytes, byte => alphabet[byte % alphabet.length]).join('');
+  return 'Prestige@2026n';
 }
 
 function serviceHeaders(service: string) {

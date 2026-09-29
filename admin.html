@@ -264,6 +264,7 @@
               <button type="button" role="tab" id="tab-team" aria-controls="panel-team" aria-selected="false" tabindex="-1" data-admin-tab="team">Team</button>
               <button type="button" role="tab" id="tab-email" aria-controls="panel-email" aria-selected="false" tabindex="-1" data-admin-tab="email">Email</button>
               <button type="button" role="tab" id="tab-account" aria-controls="panel-account" aria-selected="false" tabindex="-1" data-admin-tab="account">Account</button>
+              <button type="button" role="tab" id="tab-help" aria-controls="panel-help" aria-selected="false" tabindex="-1" data-admin-tab="help">Help</button>
             </div>
             <div class="admin-stage">
               <div role="tabpanel" id="panel-bookings" aria-labelledby="tab-bookings" data-admin-panel="bookings">
@@ -334,7 +335,7 @@
               <div role="tabpanel" id="panel-team" aria-labelledby="tab-team" data-admin-panel="team" hidden>
                 <div class="admin-panel-head">
                   <h2 class="subhead">Team</h2>
-                  <p>Add an academy email. The starting password is shown once, and that person is reminded to replace it.</p>
+                  <p>Add an academy email. Every account starts with the same password, shown below. That person is reminded to replace it under Account.</p>
                 </div>
                 <section class="admin-panel-box">
                   <h3>New admin</h3>
@@ -367,6 +368,43 @@
                     <div class="field"><label for="new-password">New password</label><input id="new-password" name="password" type="password" autocomplete="new-password" required minlength="8"></div>
                     <button class="btn btn-ink" type="submit">Save password</button>
                   </form>
+                </section>
+              </div>
+              <div role="tabpanel" id="panel-help" aria-labelledby="tab-help" data-admin-panel="help" hidden>
+                <div class="admin-panel-head">
+                  <h2 class="subhead">Help</h2>
+                  <p>How a request reaches this desk, and what to do with it. The guest only sees a confirmation on the website. The academy inbox and this desk receive the details.</p>
+                </div>
+                <ol class="admin-flow">
+                  <li>
+                    <h3>Discovery inquiry</h3>
+                    <p>Someone uses Schedule a Discovery Consultation. The inquiry is emailed to the address on the Email tab and kept in that list. Delete it when you no longer need it. An inquiry does not hold a training date.</p>
+                  </li>
+                  <li>
+                    <h3>Open enrollment</h3>
+                    <p>An individual chooses a program and an open date, then pays on the Stripe page for that program. The booking appears under Bookings, Waiting. The inbox receives “Prestige Academy — New open enrollment.” Up to 25 people can share the same program, dates, and session.</p>
+                  </li>
+                  <li>
+                    <h3>Private training</h3>
+                    <p>An organization chooses a program, dates, and a 50% deposit or payment in full, then pays on Stripe. The booking appears under Waiting and takes the whole session. The inbox receives “Prestige Academy — New training payment.” A private booking and open enrollment cannot use the same session.</p>
+                  </li>
+                  <li>
+                    <h3>Confirm the payment</h3>
+                    <p>Check Stripe for the booking reference, then choose Confirm payment. The booking moves to Confirmed and the date stays booked. The inbox receives “Prestige Academy — Payment confirmed.” If that email does not send, the booking is still confirmed.</p>
+                  </li>
+                  <li>
+                    <h3>Open the date again</h3>
+                    <p>Release date keeps the record under Released and opens the session. Delete booking removes the record and opens the date. An expired hold also opens the date, and the request stays under Waiting so you can still confirm the payment if it arrived and the session is open.</p>
+                  </li>
+                </ol>
+                <h3 class="admin-sub">Dates</h3>
+                <section class="admin-panel-box">
+                  <p>Training runs on weekdays from November 2, 2026, Central time. Half-day is morning, 9:00–12:00, or afternoon, 1:00–4:00. Full-day is one weekday. Two-day is the next two weekdays. Five-day is the next five weekdays. Weekends are skipped.</p>
+                  <p>A new request holds its session for the hours set on the Dates tab. A request that is already pending keeps the time it was given. Registration closes 48 hours before the session, when a cohort reaches 25, or when you close the date.</p>
+                </section>
+                <h3 class="admin-sub">Team and sign-in</h3>
+                <section class="admin-panel-box">
+                  <p>The starting password for every desk account is Prestige@2026n. Create or reset an account on the Team tab, then ask that person to replace it under Account. You cannot remove the account you are signed in with. The desk always keeps at least one admin.</p>
                 </section>
               </div>
             </div>
