@@ -25,7 +25,7 @@ const sessions = { AM: 'Morning, 9:00–12:00', PM: 'Afternoon, 1:00–4:00', DA
 const payments = { deposit: '50% deposit', full: 'Pay in full', enrollment: 'Open enrollment' };
 const statuses = { pending: 'Pending', confirmed: 'Confirmed', expired: 'Expired', released: 'Released' };
 const viewCopy = {
-  waiting: 'These requests are not confirmed yet. A pending date is held. An expired hold no longer blocks the date, and you can still confirm the payment if it arrived and the session is still open.',
+  waiting: 'These requests are not confirmed yet. A pending date is held for the hours set on Dates. When that hold ends, the booking moves to Released and the date opens.',
   confirmed: 'Confirmed bookings stay on this desk. The date stays booked until you release it or delete the record.',
   released: 'Released bookings stay here as a record. The date is open again.',
   all: 'Every booking is stored here. Waiting, confirmed, and released are the same record at different points.',
@@ -67,6 +67,11 @@ function fact(label, value) {
 
 function note(node, message) {
   node.textContent = message;
+  if (!message) return;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const top = node.getBoundingClientRect().top + window.scrollY - 120;
+    window.scrollTo({ top: Math.max(0, top) });
+  }));
 }
 
 function showTab(name) {
@@ -168,6 +173,7 @@ function paintBookings() {
 function bookingCard(booking) {
   const article = document.createElement('article');
   article.className = `admin-card${booking.status === 'pending' || booking.status === 'expired' ? ' admin-card-open' : ''}`;
+  article.dataset.bookingId = booking.id;
   const top = document.createElement('div');
   top.className = 'admin-card-top';
   const identity = document.createElement('div');
@@ -251,8 +257,7 @@ function bookingCard(booking) {
     confirm.className = 'btn btn-ink';
     confirm.textContent = 'Confirm payment';
     confirm.addEventListener('click', () => {
-      if (!window.confirm(`Confirm payment for ${personLabel}? Check Stripe for reference ${booking.reference} first. The date stays booked.`)) return;
-      confirmPayment(booking);
+      ask(actions, `Confirm payment for ${personLabel}? Check Stripe for reference ${booking.reference} first. The date stays booked.`, () => confirmPayment(booking));
     });
     actions.append(confirm);
   }
@@ -265,8 +270,7 @@ function bookingCard(booking) {
       const warning = booking.status === 'confirmed'
         ? `Release ${personLabel}? This booking is already confirmed. The date opens again, and the record stays under Released.`
         : `Release ${personLabel}? The date opens again, and the record stays under Released.`;
-      if (!window.confirm(warning)) return;
-      act('release_booking', booking.id, 'Date released. The record is under Released.');
+      ask(actions, warning, () => act('release_booking', booking.id, `${personLabel} is released. The record is under Released.`));
     });
     actions.append(release);
   }
@@ -275,8 +279,7 @@ function bookingCard(booking) {
   remove.className = 'btn btn-ghost-ink';
   remove.textContent = 'Delete booking';
   remove.addEventListener('click', () => {
-    if (!window.confirm(`Delete ${personLabel}? The record is removed and the date becomes available.`)) return;
-    act('delete_booking', booking.id, 'Booking deleted.');
+    ask(actions, `Delete ${personLabel}? The record is removed and the date becomes available.`, () => act('delete_booking', booking.id, `${personLabel} was deleted.`));
   });
   actions.append(remove);
   article.append(top, facts, person, actions);
@@ -494,6 +497,7 @@ async function loadTeam() {
 }
 
 async function load() {
+  await supabase.rpc('release_expired_holds');
   const [{ data: bookings, error: bookingError }, { data: closures, error: closureError }, { data: hold }] = await Promise.all([
     supabase.from('bookings').select('id, reference, program, kind, dates, session, payment, amount_usd, contact_name, email, phone, company, agreement, status, hold_until, created_at, updated_at').order('created_at', { ascending: false }),
     supabase.from('closures').select('id, closed_on, session, note').order('closed_on'),
@@ -544,19 +548,62 @@ async function confirmPayment(booking) {
   const { error } = await supabase.rpc('confirm_booking', { p_id: booking.id });
   if (error) {
     note(status, error.message);
-    return;
+    throw new Error(error.message);
   }
+  bookingRows = bookingRows.map(row => row.id === booking.id ? { ...row, status: 'confirmed', hold_until: null } : row);
+  bookingView = 'confirmed';
+  paintBookings();
+  document.querySelector(`[data-booking-id="${booking.id}"]`)?.scrollIntoView({ block: 'center' });
+  note(status, `${booking.contact_name} is confirmed. The date stays booked.`);
   let sent = false;
   try {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.access_token) sent = await postDeskNotice(session.access_token, booking.id);
   } catch { sent = false; }
-  note(status, sent ? 'Payment confirmed. The notice is in the academy inbox.' : 'Payment confirmed. It is now under Confirmed.');
+  note(status, sent
+    ? `${booking.contact_name} is confirmed. The notice is in the academy inbox.`
+    : `${booking.contact_name} is confirmed. It is now under Confirmed.`);
   await load();
+}
+
+function ask(actions, message, onYes) {
+  actions.querySelector('.admin-confirm')?.remove();
+  const bar = document.createElement('div');
+  bar.className = 'admin-confirm';
+  const text = document.createElement('p');
+  text.textContent = message;
+  const yes = document.createElement('button');
+  yes.type = 'button';
+  yes.className = 'btn btn-ink';
+  yes.textContent = 'Yes, continue';
+  const no = document.createElement('button');
+  no.type = 'button';
+  no.className = 'btn btn-ghost-ink';
+  no.textContent = 'Cancel';
+  yes.addEventListener('click', async () => {
+    yes.disabled = true;
+    no.disabled = true;
+    try {
+      await onYes();
+    } catch (error) {
+      text.textContent = error.message || 'That could not be saved.';
+      yes.disabled = false;
+      no.disabled = false;
+    }
+  });
+  no.addEventListener('click', () => bar.remove());
+  bar.append(text, yes, no);
+  actions.append(bar);
+  bar.scrollIntoView({ block: 'nearest' });
 }
 
 async function act(fn, id, success = 'Saved.') {
   const { error } = await supabase.rpc(fn, { p_id: id });
+  if (!error && fn === 'delete_booking') bookingRows = bookingRows.filter(row => row.id !== id);
+  if (!error && fn === 'release_booking') {
+    bookingRows = bookingRows.map(row => row.id === id ? { ...row, status: 'released', hold_until: null } : row);
+  }
+  if (!error) paintBookings();
   note(status, error ? error.message : success);
   await load();
 }

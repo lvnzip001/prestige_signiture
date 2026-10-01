@@ -19,7 +19,7 @@ for (const width of widths) {
       await page.evaluate(() => document.fonts.ready);
       await expect(page.locator("h1")).toHaveCount(1);
       await expect(page.locator("h1")).toBeVisible();
-      await expect(page.locator(".nav-toggle")).toBeVisible();
+      await expect(page.locator(".nav-toggle")).toBeVisible({ visible: width < 1280 });
       await expect(page.locator(".desktop-nav")).toBeVisible({ visible: width >= 1280 });
       const overflow = await page.evaluate(() => [...document.querySelectorAll("main *, header *, footer *")].filter(node => {
         const rect = node.getBoundingClientRect();

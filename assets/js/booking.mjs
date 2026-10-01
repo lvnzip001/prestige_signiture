@@ -315,6 +315,10 @@ if (root) {
       const approved = new URL(chosenProgram.links[payment]);
       const reference = url.searchParams.get('client_reference_id') || '';
       if (url.origin !== approved.origin || url.pathname !== approved.pathname || !/^[a-zA-Z0-9_-]{16,200}$/.test(reference)) throw new Error('Your booking could not be verified. Please contact Prestige before paying.');
+      // Payment Links support editable email prefill; other contact/booking fields
+      // stay on the saved booking, associated through client_reference_id.
+      // URLSearchParams also preserves plus signs in email aliases.
+      url.searchParams.set('prefilled_email', String(payload.email).trim());
       try { sessionStorage.setItem('prestige-booking-ref', reference); } catch { /* Checkout still works with browser storage disabled. */ }
       notice.hidden = false;
       notice.textContent = `Your request is pending. Reference ${reference}. Prestige will confirm it after payment is received.`;

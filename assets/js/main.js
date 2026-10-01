@@ -65,7 +65,17 @@
         event.preventDefault(); first.focus();
       }
     });
-    desktop.addEventListener("change", () => setMenu(false));
+    desktop.addEventListener("change", () => {
+      const primary = header?.querySelector('.desktop-nav');
+      const focused = document.activeElement;
+      const compactFocused = focused === toggle || menu.contains(focused);
+      const primaryFocused = primary?.contains(focused);
+      setMenu(false);
+      // Keep keyboard focus on visible navigation when the layout switches.
+      if (desktop.matches && compactFocused) {
+        (primary?.querySelector('[aria-current="page"]') || primary?.querySelector('a'))?.focus();
+      } else if (!desktop.matches && primaryFocused) toggle.focus();
+    });
   }
 
   let dismissedMenu = null;

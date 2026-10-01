@@ -243,10 +243,13 @@ function footer(activeFile) {
     </div>
     <div class="wrap footer-base">
       <p>&copy; <span data-year>2026</span> The Prestige Signature Standard Academy. All rights reserved.</p>
-      <nav class="footer-legal" aria-label="Policies">
+      <nav class="footer-legal" aria-label="Policies and administration">
         <a${here("privacy.html")} href="privacy.html">Privacy</a>
         <a${here("terms.html")} href="terms.html">Terms</a>
         <a${here("accessibility.html")} href="accessibility.html">Accessibility</a>
+        <a${here("admin.html")} class="footer-admin" href="admin.html" aria-label="Admin login" title="Admin login">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5.5C9 3.5 5 3.5 2 5v15c3-1.5 7-1.5 10 .5 3-2 7-2 10-.5V5c-3-1.5-7-1.5-10 .5Z"/><path d="M12 5.5v15"/></svg>
+        </a>
       </nav>
     </div>
   </footer>`;
@@ -1312,7 +1315,7 @@ const admin = layout({
               <div role="tabpanel" id="panel-bookings" aria-labelledby="tab-bookings" data-admin-panel="bookings">
                 <div class="admin-panel-head">
                   <h2 class="subhead">Bookings</h2>
-                  <p data-admin-booking-copy>These requests are not confirmed yet. A pending date is held. An expired hold no longer blocks the date, and you can still confirm the payment if it arrived and the session is still open.</p>
+                  <p data-admin-booking-copy>These requests are not confirmed yet. A pending date is held for the hours set on Dates. When that hold ends, the booking moves to Released and the date opens.</p>
                 </div>
                 <div class="admin-toolbar">
                   <div class="field admin-search">
@@ -1331,7 +1334,7 @@ const admin = layout({
               <div role="tabpanel" id="panel-dates" aria-labelledby="tab-dates" data-admin-panel="dates" hidden>
                 <div class="admin-panel-head">
                   <h2 class="subhead">Dates</h2>
-                  <p>Weekdays from November 2, 2026 are listed below. A pending or confirmed booking holds that session. An expired hold leaves the date open.</p>
+                  <p>Weekdays from November 2, 2026 are listed below. A pending or confirmed booking holds that session. When a hold ends, the booking moves to Released and the date opens.</p>
                 </div>
                 <div class="admin-schedule-head">
                   <button class="btn btn-ghost-ink" type="button" data-admin-month-prev>Previous month</button>
@@ -1436,7 +1439,7 @@ const admin = layout({
                   </li>
                   <li>
                     <h3>Open the date again</h3>
-                    <p>Release date keeps the record under Released and opens the session. Delete booking removes the record and opens the date. An expired hold also opens the date, and the request stays under Waiting so you can still confirm the payment if it arrived and the session is open.</p>
+                    <p>Release date keeps the record under Released and opens the session. Delete booking removes the record and opens the date. When the hold ends, the booking moves to Released on its own and the date opens.</p>
                   </li>
                 </ol>
                 <h3 class="admin-sub">Dates</h3>

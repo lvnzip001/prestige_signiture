@@ -25,9 +25,9 @@ async function service(page, options = {}) {
   });
 }
 
-async function fillDetails(page, kind) {
+async function fillDetails(page, kind, email = 'participant@example.com') {
   await page.locator('#booking-name').fill('Test Participant');
-  await page.locator('#booking-email').fill('participant@example.com');
+  await page.locator('#booking-email').fill(email);
   await page.locator('#booking-phone').fill('5015550100');
   if (kind === 'private') {
     await page.locator('#booking-company').fill('Test Hospitality');
@@ -55,10 +55,11 @@ for (const p of PROGRAMS) {
       if (kind === 'private') await expect(page.locator('.payment-choices')).toBeVisible();
       await expect(page.locator('[data-summary-date]')).toContainText(p.days === 5 ? 'Nov 6, 2026' : p.days === 2 ? 'Nov 3, 2026' : 'Nov 2, 2026');
       if (kind === 'private') await page.locator(`input[name="payment"][value="${payment}"]`).check();
-      await fillDetails(page, kind);
+      const email = 'participant+training@example.com';
+      await fillDetails(page, kind, email);
       await page.locator('[data-checkout]').click();
-      await expect(page).toHaveURL(`${p.links[payment]}?client_reference_id=booking_reference_12345678`);
-      expect(payload).toMatchObject({ kind, program: p.id, payment, date: '2026-11-02', session: p.halfDay ? 'PM' : 'DAY' });
+      await expect(page).toHaveURL(`${p.links[payment]}?client_reference_id=booking_reference_12345678&prefilled_email=participant%2Btraining%40example.com`);
+      expect(payload).toMatchObject({ kind, program: p.id, payment, email, date: '2026-11-02', session: p.halfDay ? 'PM' : 'DAY' });
       expect(payload).not.toHaveProperty('price');
     });
   }
