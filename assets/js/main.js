@@ -8,7 +8,7 @@
   const main = document.querySelector("main");
   const footer = document.querySelector(".site-footer");
   const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const desktop = window.matchMedia("(min-width: 1440px)");
+  const desktop = window.matchMedia("(min-width: 1280px)");
   const filename = location.pathname.split("/").pop() || "index.html";
   const page = filename.includes(".") ? filename : `${filename}.html`;
   const pageParams = new URLSearchParams(location.search);
@@ -32,6 +32,10 @@
     document.body.classList.toggle("nav-open", open);
     if (main) main.inert = open;
     if (footer) footer.inert = open;
+    const primary = header?.querySelector('.desktop-nav');
+    if (primary) primary.inert = open;
+    const headerCta = header?.querySelector('.header-cta');
+    if (headerCta) headerCta.inert = open;
     if (open) {
       menu.hidden = false;
       requestAnimationFrame(() => menu.classList.add("is-open"));
@@ -61,7 +65,7 @@
         event.preventDefault(); first.focus();
       }
     });
-    desktop.addEventListener("change", event => { if (event.matches) setMenu(false); });
+    desktop.addEventListener("change", () => setMenu(false));
   }
 
   let dismissedMenu = null;

@@ -7,6 +7,9 @@ const widths = [360, 390, 768, 1024, 1280, 1440, 1920];
 for (const width of widths) {
   for (const route of routes) {
     test(`${route} at ${width}px`, async ({ page }, testInfo) => {
+      // The local-server detection probe has no parameters and always returns an
+      // empty list. Keep layout QA independent of its upstream network latency.
+      await page.route('**/api/availability', route => route.fulfill({ json: { slots: [] } }));
       const failures = [];
       page.on("pageerror", error => failures.push(error.message));
       page.on("requestfailed", request => failures.push(`${request.failure().errorText} ${request.url()}`));
@@ -16,7 +19,8 @@ for (const width of widths) {
       await page.evaluate(() => document.fonts.ready);
       await expect(page.locator("h1")).toHaveCount(1);
       await expect(page.locator("h1")).toBeVisible();
-      await expect(page.locator(".nav-toggle")).toBeVisible({ visible: width < 1440 });
+      await expect(page.locator(".nav-toggle")).toBeVisible();
+      await expect(page.locator(".desktop-nav")).toBeVisible({ visible: width >= 1280 });
       const overflow = await page.evaluate(() => [...document.querySelectorAll("main *, header *, footer *")].filter(node => {
         const rect = node.getBoundingClientRect();
         return rect.width && getComputedStyle(node).position !== "absolute" && rect.right > document.documentElement.clientWidth + 1 && !node.closest(".sector-nav, .mobile-nav, .program-rail");
@@ -60,7 +64,7 @@ test("navigation traps focus, closes with Escape, and releases on resize", async
   await page.keyboard.press("Escape");
   await expect(toggle).toBeFocused();
   await expect(page.locator("main")).not.toHaveAttribute("inert", "");
-  await page.setViewportSize({ width: 1366, height: 900 });
+  await page.setViewportSize({ width: 1024, height: 900 });
   await expect(toggle).toBeVisible();
   await toggle.click();
   await page.setViewportSize({ width: 1440, height: 900 });

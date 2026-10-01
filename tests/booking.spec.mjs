@@ -49,8 +49,10 @@ for (const p of PROGRAMS) {
       await page.route('https://buy.stripe.com/**', route => route.fulfill({ contentType: 'text/html', body: '<h1>Intercepted checkout</h1>' }));
       const kind = payment === 'enrollment' ? 'enrollment' : 'private';
       await page.goto(`/${kind === 'enrollment' ? 'open-enrollment' : 'private-training'}.html?program=${p.id}#booking`);
+      if (kind === 'private') await expect(page.locator('.payment-choices')).toBeHidden();
       await page.getByRole('button', { name: 'Nov 2, 2026, available', exact: true }).click();
       if (p.halfDay) await page.getByRole('button', { name: /PM session/ }).click();
+      if (kind === 'private') await expect(page.locator('.payment-choices')).toBeVisible();
       await expect(page.locator('[data-summary-date]')).toContainText(p.days === 5 ? 'Nov 6, 2026' : p.days === 2 ? 'Nov 3, 2026' : 'Nov 2, 2026');
       if (kind === 'private') await page.locator(`input[name="payment"][value="${payment}"]`).check();
       await fillDetails(page, kind);
@@ -131,8 +133,8 @@ test('a checkout return does not assert success without server confirmation', as
   await expect(page.locator('[data-confirmation]')).toContainText('does not by itself confirm');
   await service(page);
   await page.route('**/api/status?**', route => route.fulfill({ json: { status: 'pending' } }));
-  await page.goto('/booking-confirmation.html?session_id=cs_test_12345678901234567890');
-  await expect(page.locator('[data-confirmation]')).toContainText('still being processed');
+  await page.goto('/booking-confirmation.html?ref=0123456789abcdef0123456789abcdef');
+  await expect(page.locator('[data-confirmation]')).toContainText('team is checking');
 });
 
 test('approved artwork is preserved byte-for-byte', async () => {

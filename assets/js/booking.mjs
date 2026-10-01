@@ -96,6 +96,7 @@ if (root) {
     const price = kind === 'enrollment' ? p.enrollment : p.private / (form.elements.payment.value === 'deposit' ? 2 : 1);
     $('[data-summary-price]').textContent = money(price);
     if (kind === 'private') {
+      $('.payment-choices').hidden = !selected;
       $('[data-deposit-price]').textContent = money(p.private / 2);
       $('[data-full-price]').textContent = money(p.private);
     }
@@ -314,7 +315,7 @@ if (root) {
       const approved = new URL(chosenProgram.links[payment]);
       const reference = url.searchParams.get('client_reference_id') || '';
       if (url.origin !== approved.origin || url.pathname !== approved.pathname || !/^[a-zA-Z0-9_-]{16,200}$/.test(reference)) throw new Error('Your booking could not be verified. Please contact Prestige before paying.');
-      sessionStorage.setItem('prestige-booking-ref', reference);
+      try { sessionStorage.setItem('prestige-booking-ref', reference); } catch { /* Checkout still works with browser storage disabled. */ }
       notice.hidden = false;
       notice.textContent = `Your request is pending. Reference ${reference}. Prestige will confirm it after payment is received.`;
       window.setTimeout(() => location.assign(url.href), 900);
@@ -333,15 +334,15 @@ if (root) {
 const confirmation = document.querySelector('[data-confirmation]');
 if (confirmation && config.statusEndpoint) {
   const params = new URLSearchParams(location.search);
-  const ref = params.get('ref') || '';
-  const session = params.get('session_id');
+  let storedRef = '';
+  try { storedRef = sessionStorage.getItem('prestige-booking-ref') || ''; } catch { /* Explicit reference still works when storage is unavailable. */ }
+  const ref = params.get('ref') || storedRef;
   serviceUrl(config.statusEndpoint).then(url => {
   if (/^[a-z0-9]{32}$/.test(ref)) url.searchParams.set('ref', ref);
-  else if (session && /^cs_[A-Za-z0-9_]{16,250}$/.test(session)) url.searchParams.set('session_id', session);
   if ([...url.searchParams.keys()].length) {
     confirmation.textContent = 'Checking your payment and booking confirmation…';
     request(url).then(data => {
-      const messages = { confirmed: 'Your training is confirmed. Prestige will contact you with your training details.', pending: 'Your payment confirmation is still being processed. The request stays pending until Prestige confirms it. Do not make another payment.', review: 'Prestige is reviewing your booking. Please contact the Academy before making another payment.', released: 'This booking was released. The date is available again. Contact Prestige if you still need training.', expired: 'This request has expired. Please return to the training calendar to choose an available date.' };
+      const messages = { confirmed: 'Your training is confirmed. Prestige will contact you with your training details.', pending: 'The academy team is checking your payment. Your request stays pending until Prestige confirms it. Do not make another payment.', review: 'Prestige is reviewing your booking. Please contact the Academy before making another payment.', released: 'This booking was released. The date is available again. Contact Prestige if you still need training.', expired: 'This booking hold has expired. If you have already paid, contact Prestige before making another payment. Otherwise, return to the calendar to choose an available date.' };
       confirmation.textContent = messages[data.status] || 'Please contact Prestige to check your booking status.';
     }).catch(() => { confirmation.textContent = 'We couldn’t verify your booking status. Please contact Prestige before making another payment.'; });
   }

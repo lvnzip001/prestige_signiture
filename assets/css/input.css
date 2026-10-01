@@ -1777,7 +1777,7 @@ form {
   }
 }
 
-@media (min-width: 1440px) {
+@media (min-width: 1280px) {
   .header-inner {
     display: grid;
     align-items: stretch;
@@ -1796,16 +1796,11 @@ form {
   .desktop-nav {
     display: flex;
     justify-self: center;
-  }
-
-  .nav-toggle {
-    display: none;
-  }
-
-  .mobile-nav {
-    display: none !important;
+    gap: clamp(.65rem, .9vw, 1.2rem);
   }
 }
+
+.nav-open .nav-panel { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   html {

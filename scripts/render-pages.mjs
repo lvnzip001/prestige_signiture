@@ -152,7 +152,12 @@ function menuFeature([href, image, alt, label, note]) {
 
 function header(activeFile) {
   const isCurrent = (menu) => menu.href === activeFile || (menu.mark || []).includes(activeFile);
-  const desktop = menus.map((menu) => `<div class="nav-item" data-nav-item>
+  const desktopMenus = ['programs', 'standard', 'serve', 'credential', 'about'].map(id => {
+    const menu = menus.find(item => item.id === id);
+    return { ...menu, label: id === 'standard' ? 'The P.O.I.S.E. Method™' : id === 'credential' ? 'Credential' : menu.label };
+  });
+  desktopMenus.push({ id: 'enrollment', href: 'open-enrollment.html', label: 'Open Enrollment', lead: 'Your program. Your available training dates.', feature: ['open-enrollment.html#booking', 'hero-training', 'Hospitality professionals taking part in training.', 'Open Enrollment', 'Individual professional development.'], items: PROGRAMS.map(p => [`open-enrollment.html?program=${p.id}#booking`, p.name, p.benefit]) });
+  const desktop = desktopMenus.map((menu) => `<div class="nav-item" data-nav-item>
           <a class="nav-link" data-nav ${isCurrent(menu) ? 'aria-current="page"' : ""} href="${menu.href}">${menu.label}</a>
           <div class="nav-panel" id="nav-${menu.id}" role="region" aria-label="${menu.label}">
             <div class="nav-panel-inner">
@@ -177,6 +182,7 @@ function header(activeFile) {
         <img src="assets/images/brand-master.jpg" width="1536" height="1024" alt="The Prestige Signature Standard Academy">
       </a>
       <nav class="desktop-nav" aria-label="Primary">
+        <a class="nav-link" data-nav ${activeFile === 'index.html' ? 'aria-current="page"' : ''} href="index.html">Home</a>
         ${desktop}
       </nav>
       <div class="header-tools">
@@ -190,6 +196,8 @@ function header(activeFile) {
     <div id="mobile-nav" class="mobile-nav" data-nav-panel>
       <nav aria-label="Mobile">
         ${modalButton("Schedule a Discovery Consultation", "discovery", "btn-light")}
+        <a data-nav href="index.html">Home</a>
+        <a data-nav href="open-enrollment.html#booking">Open Enrollment</a>
         ${mobile}
       </nav>
     </div>
@@ -1122,7 +1130,7 @@ const enrollment = layout({
   body: `${heroBlock({ page: true, image: "academy-training", position: "center 20%", alt: "Hospitality professionals practicing glassware, plate and service-tool standards.", kicker: "Training for yourself", title: "Your Ambition.<br>The Prestige Standard.", lead: "Build the presence, confidence and practical skills to create experiences worth remembering. Choose the professional development that is right for you.", actions: button("Choose Your Program", "#booking", "btn-light") })}
   <section class="training-intro bg-cream"><div class="wrap"><p>Training from November 2, 2026</p><p>Up to 25 participants per cohort</p><p>Individual registration</p></div></section>
   ${bookingMarkup('enrollment')}
-  <section class="section bg-cream"><div class="wrap enrollment-explainer"><div><p class="eyebrow">Choose your own path</p><h2 class="section-title">The program you want.<br>The opportunity to grow.</h2></div><div><p>Choose the program that supports your professional goals. Select an available date, then complete payment. Prestige confirms the registration after payment is received.</p><p>Half-Day programs offer AM and PM sessions. Longer programs cover a complete training block. Each cohort welcomes up to 25 participants; Prestige confirms your session and registration arrangements directly.</p><a class="text-link" href="professional-credential.html">Explore the professional credential pathway →</a></div></div></section>`,
+  <section class="section bg-cream"><div class="wrap enrollment-explainer"><div><p class="eyebrow">Choose your own path</p><h2 class="section-title">The program you want.<br>The opportunity to grow.</h2></div><div><p>Choose the program that supports your professional goals. Select an available date, then complete payment. Prestige confirms the registration after payment is received.</p><p>Half-Day programs offer AM and PM sessions. Longer programs cover a complete training block. Each cohort welcomes up to 25 participants. Choose your training dates using the calendar. Prestige verifies payment before confirming your registration.</p><a class="text-link" href="professional-credential.html">Explore the professional credential pathway →</a></div></div></section>`,
 });
 
 const bookingConfirmation = layout({
@@ -1131,7 +1139,7 @@ const bookingConfirmation = layout({
   body: `<section class="section bg-ivory"><div class="wrap confirmation-wrap"><p class="eyebrow">Your Prestige experience</p><h1 class="page-title">Your booking status</h1><div class="confirmation-card" data-confirmation role="status"><h2 class="subhead">Check your confirmation</h2><p>Payment does not by itself confirm your training. Prestige confirms your place after payment is received. Contact the Academy if you need help with your registration.</p></div><div class="actions">${button("Open Enrollment", "open-enrollment.html", "btn-ink")}${button("Contact Prestige", "contact.html", "btn-ghost-ink")}</div></div></section>`,
 });
 
-const policyDate = "September 29, 2026";
+const policyDate = "October 1, 2026";
 
 function legalId(headingText) {
   return headingText.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -1191,8 +1199,8 @@ const privacy = legalPage({
   sections: [
     ["Who this notice is for", `<p>The Prestige Signature Standard Academy operates this website from Bryant, Arkansas. This notice explains what Prestige does with the details you share when you ask about training or register for a program.</p>`],
     ["Information you share", `<p>A discovery inquiry asks for your name, company, title, email, phone, industry, the number of people to train, city and state, the program you are considering, your preferred timing, and a short note about your current service challenge. You confirm that Prestige may contact you about that inquiry.</p><p>A training registration asks for your name, email, and phone. Private training also asks for your organization and the reference on your approved training agreement. Open Enrollment may include your employer or role. Prestige records the program, dates, and session you select.</p>`],
-    ["How Prestige uses it", `<p>Prestige uses these details to reply to your inquiry, hold the training date you requested, and confirm your place after payment is received. Prestige contacts you about the inquiry or registration you submitted.</p>`],
-    ["Payment", `<p>Payment is completed on a secure payment page. This website does not ask for card details. A request holds the selected session for 16 hours. If Prestige has not confirmed it by then, the date becomes available again. Starting payment, or returning to this site, does not by itself confirm the training date.</p>`],
+    ["How Prestige uses it", `<p>Prestige uses these details to reply to your inquiry, hold the training date you requested, and confirm your place after payment is received. Prestige contacts you about the inquiry or registration you submitted.</p><p>Inquiry forms submit directly through this website. Supabase stores the details, and FormSubmit sends the notification to the academy inbox. The on-screen message reports the submission outcome.</p>`],
+    ["Payment", `<p>Payment is completed on the secure Stripe payment page. This website does not ask for card details. A request temporarily holds the selected session for the hold period set by Prestige. If Prestige has not confirmed it by then, the date becomes available again. Starting payment, or returning to this site, does not by itself confirm the training date.</p>`],
     ["What Prestige does not do", `<p>Prestige does not sell the information you provide. This website does not use advertising or analytics cookies. The details you submit are used to respond to your inquiry or registration.</p>`],
     ["How long it is kept", `<p>Prestige keeps inquiry and registration details for as long as they are needed to respond, deliver the training, and keep a record of that conversation or booking. You may ask about the information Prestige holds for you.</p>`],
     ["Your requests", `<p>You may ask Prestige to correct details you provided, or to discuss what the Academy has from your inquiry or registration. You can also call or email instead of using a form.</p>`],
@@ -1214,7 +1222,7 @@ const terms = legalPage({
     ["Private training", `<p>Private programs serve cohorts of up to 25 participants. Choose the program, the available training dates, and either a 50% deposit or payment in full. A private request stays pending until Prestige confirms that payment was received and reviews the agreement reference.</p>`],
     ["Open Enrollment", `<p>Open Enrollment training availability begins November 2, 2026. Individuals choose their program and an available date or training block. The first confirmed registration establishes that program’s cohort for those dates.</p><p>Each cohort has a maximum of 25 participants. Registration closes at capacity, 48 hours before the session, or when Prestige closes the date.</p>`],
     ["Program investment", `<p>Approved private training starts at $3,750 for Half-Day, $6,000 for Full-Day, $10,000 for Two-Day and $35,000 for the Five-Day Full Academy. Open Enrollment is $300, $500, $900 and $3,200 per person respectively. All prices are in USD.</p>`],
-    ["Payment and confirmation", `<p>Review your program, dates, and payment selection before you pay. A request holds a place for 16 hours. Payment does not by itself confirm registration. Prestige confirms your place after payment is received.</p><p>For a question about your training agreement, a cancellation, a new date, or a refund, contact Prestige. The Academy will discuss the request with you.</p>`],
+    ["Payment and confirmation", `<p>Review your program, dates, and payment selection before you pay. A request temporarily holds a place for the hold period set by Prestige. Payment does not by itself confirm registration. The academy team checks payment in Stripe and confirms your place through the booking desk.</p><p>For a question about your training agreement, a cancellation, a new date, or a refund, contact Prestige. The Academy will discuss the request with you.</p>`],
     ["The credential", `<p>The Prestige Signature Standard Professional Service Credential™ is earned only by meeting the published Five-Day Full Academy requirements, including attendance, knowledge, practical assessment, and the Module 15 capstone. A certificate of completion is not that credential. The credential is valid for two years.</p>`],
     ["Names and materials", `<p>The Prestige Signature Standard™ and the P.O.I.S.E. Method™ name the Academy’s standard and teaching sequence. Text, photographs, and training descriptions on this site belong to the Academy and are here so you can learn about the programs. They are not a license to copy the curriculum or present it as someone else’s program.</p>`],
     ["Using the site", `<p>Use the site to read about the Academy and to request contact or registration. Do not disrupt the site, or submit another person’s information without permission to do so.</p>`],
